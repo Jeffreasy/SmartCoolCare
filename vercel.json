@@ -1,6 +1,11 @@
 {
   "version": 2,
+  "name": "smartcool-care",
   "builds": [
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
+    },
     {
       "src": "package.json",
       "use": "@vercel/static-build",
@@ -66,6 +71,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

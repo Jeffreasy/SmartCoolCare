@@ -85,35 +85,59 @@ export function DemoModal({
     [onTriggerClick, triggerClassName, triggerSize, triggerText, triggerVariant]
   );
 
-  function onSubmit(values: DemoModalFormValues) {
+  async function onSubmit(values: DemoModalFormValues) {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
 
-    // Demo-only submission simulation (same behavior as previous embedded form).
-    setTimeout(() => {
-      try {
-        console.log("Form submitted:", values);
-        toast({
-          title: "Aanvraag ontvangen!",
-          description:
-            "We nemen binnen 24 uur contact op. Bedankt voor je interesse in SmartCool Care.",
-          duration: 5000,
-        });
-        form.reset();
-        setOpen(false);
-      } catch {
-        toast({
-          title: "Er ging iets mis",
-          description: "Probeer het later opnieuw.",
-          variant: "destructive",
-          duration: 5000,
-        });
-      } finally {
-        isSubmittingRef.current = false;
-        setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data: unknown = await response.json().catch(() => null);
+      const errorMessage =
+        typeof data === "object" && data && "error" in data && typeof data.error === "string"
+          ? data.error
+          : null;
+
+      const ok =
+        response.ok &&
+        typeof data === "object" &&
+        data !== null &&
+        "ok" in data &&
+        data.ok === true;
+
+      if (!ok) {
+        throw new Error(errorMessage ?? `Request failed (${response.status})`);
       }
-    }, 1000);
+
+      toast({
+        title: "Aanvraag ontvangen!",
+        description:
+          "We nemen binnen 24 uur contact op. Bedankt voor je interesse in SmartCool Care.",
+        duration: 5000,
+      });
+      form.reset();
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: "Er ging iets mis",
+        description:
+          error instanceof Error && error.message
+            ? error.message
+            : "Probeer het later opnieuw.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
   }
 
   const content = (
