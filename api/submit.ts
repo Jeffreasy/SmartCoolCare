@@ -30,6 +30,15 @@ function getHeaderValue(
   return value;
 }
 
+function setCorsHeaders(req: Req, res: Res) {
+  const origin = getHeaderValue(req.headers, "origin") ?? "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400");
+}
+
 function parseBooleanEnv(value: string | undefined): boolean {
   if (!value) return false;
   return value === "true" || value === "1" || value === "yes";
@@ -60,9 +69,21 @@ function requireNonEmptyString(value: unknown): string | null {
 export default async function handler(req: Req, res: Res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ ok: false, error: "Method Not Allowed" });
+  // Minimal instrumentation + resilience for browser preflight requests.
+  setCorsHeaders(req, res);
+
+  const method = (req.method ?? "UNKNOWN").toUpperCase();
+
+  if (method === "OPTIONS") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res.status(200).json({ ok: true, preflight: true });
+  }
+
+  if (method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res
+      .status(405)
+      .json({ ok: false, error: "Alleen POST toegestaan", method });
   }
 
   const body = parseBody(req.body);
