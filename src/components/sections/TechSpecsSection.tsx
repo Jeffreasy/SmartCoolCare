@@ -1,5 +1,4 @@
 import { Section } from "@/components/layout/Section";
-import { Container } from "@/components/layout/Container";
 import {
     Accordion,
     AccordionContent,
@@ -8,30 +7,24 @@ import {
 } from "@/components/ui/accordion";
 import { CheckItem } from "@/components/shared/CheckItem";
 import { techSections } from "@/lib/constants/techSpecs";
-import { motion } from "framer-motion";
-import { staggerContainer, fadeInUp } from "@/lib/animations/variants";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { StaggerInView } from "@/components/shared/StaggerInView";
+import { FadeInUpBlock } from "@/components/shared/FadeInUpBlock";
+import { MAX_W_4XL_CENTER, SECTION_STACK_DEFAULT } from "@/lib/styles";
 
 export default function TechSpecsSection() {
     return (
         <Section id="techspecs" background="bg-muted/30">
-            <Container>
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainer}
-                    className="space-y-12"
-                >
-                    <motion.div variants={fadeInUp} className="text-center space-y-4">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-primary">
-                            Betrouwbare techniek, gebouwd voor de praktijk
-                        </h2>
-                        <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
-                            Robuuste hardware en veilige software die 24/7 werkt – zonder complexe installatie.
-                        </p>
-                    </motion.div>
+            <StaggerInView className={SECTION_STACK_DEFAULT}>
+                <FadeInUpBlock>
+                    <SectionHeading
+                        title="Betrouwbare techniek, gebouwd voor de praktijk"
+                        subtitle="Robuuste hardware en veilige software die 24/7 werkt – zonder complexe installatie."
+                        titleClassName="text-4xl lg:text-5xl"
+                    />
+                </FadeInUpBlock>
 
-                    <motion.div variants={fadeInUp} className="max-w-4xl mx-auto">
+                <FadeInUpBlock className={MAX_W_4XL_CENTER}>
                         <Accordion type="single" collapsible className="w-full">
                             {techSections.map((section, sectionIndex) => (
                                 <AccordionItem key={sectionIndex} value={`item-${sectionIndex}`}>
@@ -50,9 +43,8 @@ export default function TechSpecsSection() {
                                 </AccordionItem>
                             ))}
                         </Accordion>
-                    </motion.div>
-                </motion.div>
-            </Container>
+                </FadeInUpBlock>
+            </StaggerInView>
         </Section>
     );
 }

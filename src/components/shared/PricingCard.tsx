@@ -14,6 +14,10 @@ interface PricingCardProps {
 
 export function PricingCard({ tier }: PricingCardProps) {
     const isRecommended = tier.recommended;
+    const badge = 'badge' in tier ? tier.badge : (isRecommended ? "Aanbevolen" : undefined);
+    const ctaText = 'ctaText' in tier ? tier.ctaText : "Gratis Demo Aanvragen";
+    const roi = 'roi' in tier ? tier.roi : undefined;
+    const popularityLabel = 'popularityLabel' in tier ? tier.popularityLabel : undefined;
 
     return (
         <motion.div
@@ -25,9 +29,12 @@ export function PricingCard({ tier }: PricingCardProps) {
                 "h-full flex flex-col border-2 transition-all duration-300",
                 isRecommended ? "border-accent shadow-2xl scale-105" : "border-border shadow-lg"
             )}>
-                {isRecommended && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white">
-                        Aanbevolen
+                {badge && (
+                    <Badge className={cn(
+                        "absolute -top-3 left-1/2 -translate-x-1/2 text-white",
+                        isRecommended ? "bg-accent" : "bg-primary"
+                    )}>
+                        {badge}
                     </Badge>
                 )}
 
@@ -39,9 +46,22 @@ export function PricingCard({ tier }: PricingCardProps) {
                         <span className="text-5xl font-bold text-primary">€{tier.price}</span>
                         <span className="text-muted-foreground ml-2">eenmalig</span>
                     </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                        vs. €560-€1.220 bij Testo/HOBO (3 jaar)
+                    </p>
+                    {roi && (
+                        <p className="text-sm text-green-600 font-medium mt-1">
+                            {roi}
+                        </p>
+                    )}
                     <CardDescription className="mt-4 text-base">
                         {tier.idealFor}
                     </CardDescription>
+                    {popularityLabel && (
+                        <p className="text-sm text-accent font-medium mt-2">
+                            {popularityLabel}
+                        </p>
+                    )}
                 </CardHeader>
 
                 <CardContent className="flex-1">
@@ -56,8 +76,9 @@ export function PricingCard({ tier }: PricingCardProps) {
 
                 <CardFooter className="mt-auto">
                     <DemoModal
-                        triggerText="Gratis Demo Aanvragen"
+                        triggerText={ctaText}
                         triggerSize="lg"
+                        tierName={tier.name}
                         triggerClassName={cn(
                             "w-full text-lg",
                             isRecommended

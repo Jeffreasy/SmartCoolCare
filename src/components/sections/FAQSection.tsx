@@ -1,5 +1,4 @@
 import { Section } from "@/components/layout/Section";
-import { Container } from "@/components/layout/Container";
 import {
     Accordion,
     AccordionContent,
@@ -7,30 +6,24 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { faqItems } from "@/lib/constants/faq";
-import { motion } from "framer-motion";
-import { staggerContainer, fadeInUp } from "@/lib/animations/variants";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { StaggerInView } from "@/components/shared/StaggerInView";
+import { FadeInUpBlock } from "@/components/shared/FadeInUpBlock";
+import { MAX_W_4XL_CENTER, SECTION_STACK_DEFAULT } from "@/lib/styles";
 
 export default function FAQSection() {
     return (
         <Section id="faq" background="bg-muted/30">
-            <Container>
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainer}
-                    className="space-y-12"
-                >
-                    <motion.div variants={fadeInUp} className="text-center space-y-4">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-primary">
-                            Veelgestelde vragen
-                        </h2>
-                        <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
-                            Alles wat je wilt weten over SmartCool Care – duidelijk en eerlijk beantwoord.
-                        </p>
-                    </motion.div>
+            <StaggerInView className={SECTION_STACK_DEFAULT}>
+                <FadeInUpBlock>
+                    <SectionHeading
+                        title="Veelgestelde vragen"
+                        subtitle="Alles wat je wilt weten over SmartCool Care – duidelijk en eerlijk beantwoord."
+                        titleClassName="text-4xl lg:text-5xl"
+                    />
+                </FadeInUpBlock>
 
-                    <motion.div variants={fadeInUp} className="max-w-4xl mx-auto">
+                <FadeInUpBlock className={MAX_W_4XL_CENTER}>
                         <Accordion type="single" collapsible className="w-full space-y-4">
                             {faqItems.map((faq, index) => (
                                 <AccordionItem
@@ -47,9 +40,8 @@ export default function FAQSection() {
                                 </AccordionItem>
                             ))}
                         </Accordion>
-                    </motion.div>
-                </motion.div>
-            </Container>
+                </FadeInUpBlock>
+            </StaggerInView>
         </Section>
     );
 }

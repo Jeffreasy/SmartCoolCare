@@ -1,5 +1,4 @@
 import { Section } from "@/components/layout/Section";
-import { Container } from "@/components/layout/Container";
 import {
     Table,
     TableBody,
@@ -9,12 +8,21 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { comparisonFeatures } from "@/lib/constants/comparison";
 import type { ComparisonFeature, ComparisonValue } from "@/lib/constants/comparison";
-import { motion } from "framer-motion";
-import { staggerContainer, fadeInUp } from "@/lib/animations/variants";
 import { cn } from "@/lib/utils";
-import { Check, X } from "lucide-react";
+import { Check, X, Info } from "lucide-react";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { StaggerInView } from "@/components/shared/StaggerInView";
+import { FadeInUpBlock } from "@/components/shared/FadeInUpBlock";
+import { SECTION_STACK_DEFAULT, TEXT_MUTED_LEAD } from "@/lib/styles";
 
 const columns = ["Feature", "SmartCool BASIS", "SmartCool PRO", "SmartCool ELITE", "Testo", "HOBO"] as const;
 
@@ -27,31 +35,66 @@ function renderComparisonValue(value: ComparisonValue) {
         );
     }
 
+    if (typeof value === "object") {
+        const { value: displayValue, highlight, tooltip, icon, savings } = value;
+        
+        const colorClass = highlight === "green" 
+            ? "text-accent font-semibold" 
+            : highlight === "red" 
+            ? "text-alert font-semibold" 
+            : highlight === "orange"
+            ? "text-orange-600 font-semibold"
+            : "";
+
+        const content = (
+            <span className={cn("inline-flex items-center gap-1", colorClass)}>
+                {icon && <span>{icon}</span>}
+                {displayValue}
+                {savings && <span className="text-xs ml-1 text-alert">{savings}</span>}
+            </span>
+        );
+
+        if (tooltip) {
+            return (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="inline-flex items-center gap-1 cursor-help">
+                                {content}
+                                <Info className="h-4 w-4 text-muted-foreground inline" />
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{tooltip}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            );
+        }
+
+        return content;
+    }
+
     return value;
 }
 
 export default function FeatureComparisonSection() {
     return (
         <Section id="comparison">
-            <Container>
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainer}
-                    className="space-y-12"
-                >
-                    <motion.div variants={fadeInUp} className="text-center space-y-4">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-primary">
-                            Waarom SmartCool Care de beste keuze is
-                        </h2>
-                        <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
-                            Vergelijk onze varianten met de gevestigde concurrentie.
-                            Lagere kosten, meer features en geen lock-in.
-                        </p>
-                    </motion.div>
+            <StaggerInView className={SECTION_STACK_DEFAULT}>
+                <FadeInUpBlock>
+                    <SectionHeading
+                        title="Waarom zorginstellingen overstappen naar SmartCool Care"
+                        subtitle={
+                            <>
+                                50-70% lagere TCO dan Testo/HOBO, meer preventieve features en geen abonnementsverplichtingen.
+                            </>
+                        }
+                        titleClassName="text-4xl lg:text-5xl"
+                    />
+                </FadeInUpBlock>
 
-                    <motion.div variants={fadeInUp} className="overflow-x-auto">
+                <FadeInUpBlock className="overflow-x-auto">
                         <Table className="min-w-full">
                             <TableHeader>
                                 <TableRow className="border-b-2 border-primary">
@@ -60,13 +103,16 @@ export default function FeatureComparisonSection() {
                                             key={column}
                                             className={cn(
                                                 "text-left font-semibold text-lg py-6",
-                                                column.includes("SmartCool") && "text-center text-accent"
+                                                column.includes("SmartCool") && "text-center text-accent",
+                                                column === "SmartCool PRO" && "bg-accent/10"
                                             )}
                                         >
-                                            {column === "SmartCool PRO" && (
-                                                <Badge className="ml-2 bg-accent text-white">Aanbevolen</Badge>
-                                            )}
-                                            {column}
+                                            <div className="flex flex-col items-center gap-2">
+                                                {column}
+                                                {column === "SmartCool PRO" && (
+                                                    <Badge className="bg-accent text-white">Aanbevolen</Badge>
+                                                )}
+                                            </div>
                                         </TableHead>
                                     ))}
                                 </TableRow>
@@ -82,7 +128,7 @@ export default function FeatureComparisonSection() {
                                     >
                                         <TableCell className="py-6 font-medium">{row.feature}</TableCell>
                                         <TableCell className="text-center py-6">{renderComparisonValue(row.basis)}</TableCell>
-                                        <TableCell className="text-center py-6">{renderComparisonValue(row.pro)}</TableCell>
+                                        <TableCell className="text-center py-6 bg-accent/5">{renderComparisonValue(row.pro)}</TableCell>
                                         <TableCell className="text-center py-6">{renderComparisonValue(row.elite)}</TableCell>
                                         <TableCell className="text-center py-6 text-muted-foreground">{renderComparisonValue(row.testo)}</TableCell>
                                         <TableCell className="text-center py-6 text-muted-foreground">{renderComparisonValue(row.hobo)}</TableCell>
@@ -90,15 +136,29 @@ export default function FeatureComparisonSection() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </motion.div>
+                </FadeInUpBlock>
 
-                    <motion.div variants={fadeInUp} className="text-center">
-                        <p className="text-base sm:text-lg text-muted-foreground">
-                            * 3-jaar Total Cost of Ownership berekend inclusief abonnementen bij concurrenten
+                <FadeInUpBlock className="space-y-4">
+                    <div className={cn(TEXT_MUTED_LEAD, "text-left space-y-3")}>
+                        <p className="font-semibold text-foreground">3-jaar TCO berekening:</p>
+                        <ul className="list-disc list-inside space-y-1 text-sm">
+                            <li>Eenmalige aanschafkosten apparaat</li>
+                            <li>Maandelijkse abonnementskosten (cloud platform + support)</li>
+                            <li>Geschat energieverbruik batterijen/stroomadapters</li>
+                            <li>Geen berekening voor uitval-/onderhoudskosten (variabel per merk)</li>
+                        </ul>
+                        <p className="flex items-center gap-2 font-medium text-accent mt-4">
+                            <span className="text-2xl">💡</span>
+                            <span>65% van zorginstellingen kiest PRO voor medicatiekoelkasten</span>
                         </p>
-                    </motion.div>
-                </motion.div>
-            </Container>
+                    </div>
+                    <div className="flex justify-center mt-6">
+                        <Button size="lg" asChild>
+                            <a href="#pricing">Bekijk prijzen en bestel direct</a>
+                        </Button>
+                    </div>
+                </FadeInUpBlock>
+            </StaggerInView>
         </Section>
     );
 }

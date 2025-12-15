@@ -51,6 +51,22 @@ export type DemoModalProps = {
   triggerSize?: ComponentProps<typeof Button>["size"];
   triggerClassName?: string;
   onTriggerClick?: () => void;
+  tierName?: "BASIS" | "PRO" | "ELITE";
+};
+
+const tierModalContent = {
+  BASIS: {
+    title: "Start met BASIS",
+    description: "Test 1 week gratis in jouw keuken. Geen verplichtingen.",
+  },
+  PRO: {
+    title: "Vraag Gratis Proefinstallatie",
+    description: "Installeer op jullie medicatiekoelkast. Gratis pilot van 2 weken.",
+  },
+  ELITE: {
+    title: "Plan Persoonlijk Adviesgesprek",
+    description: "Persoonlijk advies voor vaccin-/medicatieopslag. Inclusief compliance-scan.",
+  },
 };
 
 export function DemoModal({
@@ -59,7 +75,13 @@ export function DemoModal({
   triggerSize = "lg",
   triggerClassName,
   onTriggerClick,
+  tierName,
 }: DemoModalProps) {
+  const modalContent = tierName ? tierModalContent[tierName] : {
+    title: "Gratis Demo Aanvragen",
+    description: "Laat je gegevens achter en ontvang een demo van SmartCool Care.",
+  };
+  
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -260,9 +282,9 @@ export function DemoModal({
         <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Gratis Demo Aanvragen</DialogTitle>
+            <DialogTitle>{modalContent.title}</DialogTitle>
             <DialogDescription>
-              Laat je gegevens achter en ontvang een demo van SmartCool Care.
+              {modalContent.description}
             </DialogDescription>
           </DialogHeader>
           {content}
@@ -279,9 +301,9 @@ export function DemoModal({
         className="max-h-[85vh] overflow-y-auto rounded-t-2xl pb-10"
       >
         <SheetHeader className="pr-8">
-          <SheetTitle>Gratis Demo Aanvragen</SheetTitle>
+          <SheetTitle>{modalContent.title}</SheetTitle>
           <SheetDescription>
-            Laat je gegevens achter en ontvang een demo van SmartCool Care.
+            {modalContent.description}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-4">{content}</div>
