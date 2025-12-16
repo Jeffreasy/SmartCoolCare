@@ -49,8 +49,13 @@ export function Navbar() {
         <>
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <Container className="flex h-16 items-center justify-between">
-                    <a href="#hero" className="text-2xl font-bold text-primary">
-                        SmartCool Care
+                    <a href="#hero" className="flex items-center gap-2 text-2xl font-bold text-primary">
+                        <img
+                            src="/Logo Koelkasten.svg"
+                            alt="SmartCool Care Logo"
+                            className="h-12 w-auto"
+                        />
+                        <span>SmartCool Care</span>
                     </a>
 
                     {/* Desktop nav */}
@@ -100,9 +105,14 @@ export function Navbar() {
                             <div className="flex flex-col gap-6 mt-8">
                                 <a
                                     href="#hero"
-                                    className="text-2xl font-bold text-primary"
+                                    className="flex items-center gap-2 text-2xl font-bold text-primary"
                                 >
-                                    SmartCool Care
+                                    <img
+                                        src="/Logo Koelkasten.svg"
+                                        alt="SmartCool Care Logo"
+                                        className="h-12 w-auto"
+                                    />
+                                    <span>SmartCool Care</span>
                                 </a>
                                 <nav className="flex flex-col gap-4">
                                     {navLinks.map((link) => {

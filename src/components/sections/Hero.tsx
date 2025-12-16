@@ -23,6 +23,13 @@ export default function Hero() {
                 <Container>
                     <div className="relative text-center max-w-4xl mx-auto">
                         <div className="rounded-2xl bg-background/70 backdrop-blur-sm px-5 py-8 sm:px-6 sm:py-10 md:px-10 md:py-12">
+                            <div className="flex justify-center mb-8">
+                                <img
+                                    src="/Logo Koelkasten.svg"
+                                    alt="SmartCool Care Logo"
+                                    className="h-16 w-auto sm:h-20 md:h-24"
+                                />
+                            </div>
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 text-balance">
                                 Bespaar <span className="text-primary">€500+</span> per jaar én voorkom
                                 HACCP-boetes
