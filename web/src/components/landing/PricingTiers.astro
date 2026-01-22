@@ -1,0 +1,135 @@
+---
+import Tilt3D from "../ui/Tilt3D.astro";
+const plans = [
+    {
+        name: "Basis",
+        price: "€149",
+        description: "Essential compliance & automation for kitchens.",
+        color: "text-emerald-400",
+        borderColor: "border-emerald-500/20",
+        btnClass: "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300",
+        features: [
+            "24/7 Temperature Logging",
+            "15-min Interval",
+            "Cloud Dashboard",
+            "HACCP Compliant Reports",
+            "WiFi Connectivity",
+        ],
+    },
+    {
+        name: "Pro",
+        price: "€199",
+        popular: true,
+        description: "Advanced prevention & alerts for medication storage.",
+        color: "text-amber-400",
+        borderColor: "border-amber-500/30",
+        btnClass:
+            "btn-primary bg-amber-500 hover:bg-amber-600 border-none text-slate-900 shadow-amber-500/20",
+        features: [
+            "All Basis Features",
+            "Door Open Detection (>60s)",
+            "Local Audio Alarm (Buzzer)",
+            "Email/Push Alerts",
+            "Actionable Insights",
+        ],
+    },
+    {
+        name: "Elite",
+        price: "€249",
+        description: "Fail-safe protection for high-value assets (Vaccines).",
+        color: "text-red-400",
+        borderColor: "border-red-500/20",
+        btnClass: "bg-red-500/10 hover:bg-red-500/20 text-red-300",
+        features: [
+            "All Pro Features",
+            "Power-loss Detection",
+            "Battery Backup (Black Box)",
+            "Humidity & Pressure Monitoring",
+            "Critical Asset Protection protection",
+        ],
+    },
+];
+---
+
+<section id="pricing" class="py-24 relative z-10">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2
+                class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-4"
+            >
+                Simple, Transparent Pricing
+            </h2>
+            <p class="text-slate-400 text-lg">
+                One-time hardware purchase. No mandatory monthly fees.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+            {
+                plans.map((plan) => (
+                    <Tilt3D>
+                        <div
+                            class={`glass-panel p-8 relative transition-all duration-300 h-full flex flex-col ${plan.popular ? "border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-900/20" : "border-white/10"}`}
+                        >
+                            {plan.popular && (
+                                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-lg transform transition-transform duration-500 group-hover:translate-z-20">
+                                    Recommended
+                                </div>
+                            )}
+
+                            <div class="text-center mb-8 transform transition-transform duration-500 group-hover:translate-z-10">
+                                <h3
+                                    class={`text-xl font-bold mb-2 ${plan.color}`}
+                                >
+                                    {plan.name}
+                                </h3>
+                                <div class="text-4xl font-extrabold text-white mb-2">
+                                    {plan.price}
+                                </div>
+                                <p class="text-slate-500 text-sm h-10">
+                                    {plan.description}
+                                </p>
+                            </div>
+
+                            <ul class="space-y-4 mb-8 flex-1 transform transition-transform duration-500 group-hover:translate-z-10">
+                                {plan.features.map((feature) => (
+                                    <li class="flex items-center gap-3 text-slate-300 text-sm">
+                                        <svg
+                                            class={`w-5 h-5 flex-shrink-0 ${plan.color}`}
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M5 13l4 4L19 7"
+                                            />
+                                        </svg>
+                                        {feature}
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <a
+                                href="/signup"
+                                class={`block w-full text-center py-3 rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95 duration-200 ${plan.btnClass}`}
+                            >
+                                Order Now
+                            </a>
+                        </div>
+                    </Tilt3D>
+                ))
+            }
+        </div>
+
+        <div class="text-center mt-12 text-slate-500 text-sm">
+            Need a custom enterprise setup? <a
+                href="#"
+                class="text-indigo-400 underline decoration-indigo-500/30 underline-offset-4"
+                >Contact Sales</a
+            >
+        </div>
+    </div>
+</section>

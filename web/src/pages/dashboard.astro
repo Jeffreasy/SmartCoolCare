@@ -1,0 +1,71 @@
+---
+/**
+ * KoelkastProjectV2 - IoT Dashboard
+ * Hoofdpagina met real-time monitoring van alle koelkasten
+ */
+import Layout from "../layouts/Layout.astro";
+import ConnectedDashboard from "../components/ConnectedDashboard";
+---
+
+<Layout title="Koelkast Dashboard">
+  <div class="min-h-screen bg-bg text-text p-8 relative overflow-hidden">
+    <!-- Background Ambient -->
+    <div
+      class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_50%)]"
+    >
+    </div>
+
+    <main class="max-w-[1400px] mx-auto relative z-10">
+      <header
+        class="mb-12 text-center md:text-left md:flex md:justify-between md:items-end"
+      >
+        <div>
+          <div
+            class="flex items-center justify-center md:justify-start gap-4 mb-2"
+          >
+            <div class="p-3 bg-indigo-500/20 rounded-xl">
+              <svg
+                class="w-8 h-8 text-indigo-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                ></path>
+              </svg>
+            </div>
+            <h1
+              class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent"
+            >
+              Koelkast Monitor
+            </h1>
+          </div>
+          <p class="text-slate-400 text-lg">
+            Real-time monitoring & intelligent alerts
+          </p>
+        </div>
+
+        <div class="hidden md:block">
+          <div
+            class="glass-card px-4 py-2 flex items-center gap-2 text-sm text-slate-300"
+            aria-label="System Status: Online"
+            role="status"
+          >
+            <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+            System Online
+          </div>
+        </div>
+      </header>
+
+      <div id="dashboard-root" class="w-full">
+        <!-- React component wordt hier gehydrateerd met Convex provider -->
+        <!-- React component wordt hier gehydrateerd met interne Convex provider -->
+        <ConnectedDashboard client:only="react" />
+      </div>
+    </main>
+  </div>
+</Layout>

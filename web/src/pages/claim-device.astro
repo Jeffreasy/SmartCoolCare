@@ -1,0 +1,38 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ConnectedClaimForm from "../components/devices/ConnectedClaimForm.tsx";
+---
+
+<Layout title="Claim Device - KoelkastProject">
+    <div
+        class="min-h-screen flex items-center justify-center p-4 bg-slate-950 relative overflow-hidden"
+    >
+        <!-- Background Orbs -->
+        <div
+            class="absolute top-10 left-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"
+        >
+        </div>
+        <div
+            class="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-[100px]"
+        >
+        </div>
+
+        <div
+            class="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-300"
+        >
+            <div class="glass-panel p-8 md:p-10 border-white/10 bg-white/5">
+                <div class="text-center mb-8">
+                    <h1
+                        class="text-3xl font-bold bg-gradient-to-r from-success to-emerald-200 bg-clip-text text-transparent mb-2"
+                    >
+                        Connect Device
+                    </h1>
+                    <p class="text-slate-400">
+                        Enter your device serial number
+                    </p>
+                </div>
+                <ConnectedClaimForm client:only="react" />
+            </div>
+        </div>
+    </div>
+</Layout>

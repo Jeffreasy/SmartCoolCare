@@ -1,0 +1,169 @@
+---
+import Tilt3D from "../ui/Tilt3D.astro";
+---
+
+<section class="py-20 relative z-10">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2
+                class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-4"
+            >
+                The Cold Chain Challenge
+            </h2>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                Why relying on manual checks is costing you more than you think.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <!-- Old Way (Problem) -->
+            <Tilt3D>
+                <div
+                    class="glass-panel p-8 border-red-500/10 relative overflow-hidden group hover:bg-red-500/5 transition-colors duration-500 h-full"
+                >
+                    <div
+                        class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:translate-z-20 duration-500"
+                    >
+                        <svg
+                            class="w-24 h-24 text-red-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            ></path>
+                        </svg>
+                    </div>
+
+                    <div
+                        class="flex items-center gap-3 mb-6 transform transition-transform duration-500 group-hover:translate-z-10"
+                    >
+                        <div class="p-2 bg-red-500/10 rounded-lg text-red-400">
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-200">
+                            The Old Way
+                        </h3>
+                    </div>
+
+                    <ul
+                        class="space-y-4 text-slate-400 transform transition-transform duration-500 group-hover:translate-z-10"
+                    >
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-400 mt-1">✕</span>
+                            <span
+                                ><strong>Manual & Risk Prone:</strong> Time-consuming
+                                paper logs that are often incomplete or falsified.</span
+                            >
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-400 mt-1">✕</span>
+                            <span
+                                ><strong>Compliance Blindspots:</strong> No visibility
+                                during nights or weekends, risking fines (€1.5k -
+                                €50k).</span
+                            >
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-400 mt-1">✕</span>
+                            <span
+                                ><strong>High Hidden Costs:</strong> Over 1 hour/week
+                                per location spent on manual checks.</span
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </Tilt3D>
+
+            <!-- New Way (Solution) -->
+            <Tilt3D>
+                <div
+                    class="glass-panel p-8 border-indigo-500/20 bg-indigo-500/5 relative overflow-hidden group hover:bg-indigo-500/10 transition-colors duration-500 h-full"
+                >
+                    <div
+                        class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:translate-z-20 duration-500"
+                    >
+                        <svg
+                            class="w-24 h-24 text-indigo-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+                    </div>
+
+                    <div
+                        class="flex items-center gap-3 mb-6 transform transition-transform duration-500 group-hover:translate-z-10"
+                    >
+                        <div
+                            class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">
+                            The SmartCool Way
+                        </h3>
+                    </div>
+
+                    <ul
+                        class="space-y-4 text-slate-300 transform transition-transform duration-500 group-hover:translate-z-10"
+                    >
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span
+                                ><strong>24/7 Automation:</strong> Continuous measurement
+                                every 15 minutes, ensuring 100% audit readiness.</span
+                            >
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span
+                                ><strong>Instant Alerts:</strong> Get notified immediately
+                                when usage anomalies or excursions occur.</span
+                            >
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span
+                                ><strong>Compliance Guarantee:</strong> Fully HACCP
+                                & GDP compliant reporting reachable from anywhere.</span
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </Tilt3D>
+        </div>
+    </div>
+</section>

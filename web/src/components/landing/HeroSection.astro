@@ -1,0 +1,73 @@
+---
+import ProductPreview from "./ProductPreview.astro";
+---
+
+<section class="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 overflow-hidden">
+    <div class="relative z-10 max-w-7xl mx-auto text-center">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700"
+        >
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"
+            ></span>
+            Now supporting BLE Sensors
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
+            <span
+                class="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent"
+            >
+                Precision Monitoring
+            </span>
+            <br />
+            <span
+                class="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent bg-[size:200%] animate-gradient"
+            >
+                for the Modern Kitchen
+            </span>
+        </h1>
+
+        <p
+            class="mt-6 text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed md:text-2xl"
+        >
+            Automate HACCP compliance, prevent food spoilage, and get real-time
+            alerts with the Koelkast Smart Monitor.
+        </p>
+
+        <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20"
+        >
+            <a
+                href="/login"
+                class="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-xl bg-indigo-600 px-8 font-medium text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:scale-105 hover:shadow-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+            >
+                <div
+                    class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]"
+                >
+                    <div class="relative h-full w-8 bg-white/20"></div>
+                </div>
+                <span>Start Monitoring</span>
+                <svg
+                    class="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
+
+            <a
+                href="#features"
+                class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-700 bg-slate-800/50 px-8 font-medium text-slate-300 shadow-lg backdrop-blur transition-all hover:bg-slate-800 hover:text-white"
+            >
+                Learn More
+            </a>
+        </div>
+
+        <ProductPreview />
+    </div>
+</section>

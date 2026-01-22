@@ -1,0 +1,15 @@
+---
+interface Props {
+    class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div class={`group perspective-[1000px] ${className}`}>
+    <div
+        class="relative transform-style-3d transition-all duration-500 ease-out group-hover:rotate-x-2 group-hover:translate-z-4 group-hover:-translate-y-2 h-full"
+    >
+        <slot />
+    </div>
+</div>

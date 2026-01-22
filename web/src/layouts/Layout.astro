@@ -1,0 +1,42 @@
+---
+/**
+ * Base Layout voor alle paginas
+ *
+ * NOTE ON AUTHENTICATION:
+ * This Layout does NOT wrap the app in a global ConvexAuthProvider.
+ * Instead, we use the "Island Architecture" pattern where individual interactive
+ * islands (e.g., ConnectedDashboard, LoginPageIsland) wrap themselves in the provider.
+ * This keeps the static parts of the site (Layout, headers) lightweight and avoids
+ * hydration issues with Astro's MPA model.
+ */
+import "../styles/global.css";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="description"
+            content="KoelkastProjectV2 - IoT Monitoring Dashboard"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <title>{title}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body class="min-h-screen bg-bg text-text font-sans">
+        <slot />
+    </body>
+</html>
