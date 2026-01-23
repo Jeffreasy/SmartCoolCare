@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface MobileDrawerProps {
@@ -29,9 +30,9 @@ export default function MobileDrawer({
 
     if (!mount) return null;
 
-    return (
+    return createPortal(
         <div
-            className={`fixed inset-0 z-[100] flex items-end justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            className={`fixed inset-0 z-[99999] flex items-end justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             onClick={onClose}
         >
             <div
@@ -65,6 +66,7 @@ export default function MobileDrawer({
                     {children}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

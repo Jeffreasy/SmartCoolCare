@@ -100,7 +100,7 @@ function DashboardContent() {
 
             <DeviceCard onAddDevice={() => setIsAddDeviceOpen(true)} />
             <AddDeviceModal isOpen={isAddDeviceOpen} onClose={() => setIsAddDeviceOpen(false)} />
-            <DebugAuth />
+            {import.meta.env.DEV && <DebugAuth />}
         </>
     );
 }
