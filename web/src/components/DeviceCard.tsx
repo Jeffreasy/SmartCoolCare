@@ -78,61 +78,127 @@ export default function DeviceCard(props: DeviceCardProps) {
                                 setSelectedDeviceId(device._id);
                             }}
                             className={`
-                            glass-card p-6 cursor-pointer transition-all duration-300 hover:shadow-glow
-                            border-l-4 ${isOnline ? 'border-l-emerald-500' : 'border-l-red-500'}
-                            group relative overflow-hidden
+                            relative overflow-hidden
+                            bg-slate-900/40 backdrop-blur-xl
+                            border border-white/5
+                            rounded-2xl
+                            p-4 sm:p-6
+                            cursor-pointer
+                            transition-all duration-300
+                            hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-500/10
+                            group
                         `}
                         >
-                            <div className="flex justify-between items-start mb-4">
-                                <h3 className="text-lg font-bold text-slate-100 group-hover:text-indigo-400 transition-colors truncate pr-4 flex items-center gap-2">
-                                    <DeviceTypeIcon type={device.deviceType} />
-                                    {device.displayName || device.deviceId}
-                                </h3>
+                            {/* Decorative Glow Line */}
+                            <div className={`
+                                absolute top-0 left-0 bottom-0 w-1.5
+                                ${isOnline ? 'bg-gradient-to-b from-emerald-400 to-emerald-600' : 'bg-slate-700'}
+                                shadow-[0_0_15px_rgba(52,211,153,0.3)]
+                            `} />
+
+                            {/* Header */}
+                            <div className="flex justify-between items-start mb-4 sm:mb-6 pl-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 sm:p-2.5 bg-slate-800/50 rounded-lg border border-white/5">
+                                        <DeviceTypeIcon type={device.deviceType} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight group-hover:text-indigo-400 transition-colors">
+                                            {device.displayName || device.deviceId}
+                                        </h3>
+                                    </div>
+                                </div>
                                 <span className={`
-                                px-3 py-1 rounded-full text-xs font-semibold
-                                ${isOnline
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                        : 'bg-red-500/10 text-red-400 border border-red-500/20'}
-                            `}>
+                                    px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wider
+                                    border backdrop-blur-md
+                                    ${isOnline
+                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                                        : 'bg-red-500/10 text-red-400 border-red-500/20'}
+                                `}>
                                     {isOnline ? 'ONLINE' : 'OFFLINE'}
                                 </span>
                             </div>
-                            {/* Summary Metrics */}
-                            <div className="space-y-3">
+
+                            {/* Main Telemetry Grid */}
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 pl-3">
+                                {/* Wired Sensor Box */}
+                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-indigo-500/10 relative overflow-hidden group/wired">
+                                    <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/wired:opacity-100 transition-opacity">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_5px_#6366f1]"></div>
+                                    </div>
+                                    <p className="text-[9px] sm:text-[10px] text-indigo-300/60 uppercase font-black tracking-widest mb-1">WIRED</p>
+                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastWiredTemp !== undefined ? 'text-indigo-400' : 'text-slate-700'}`}>
+                                        {device.lastWiredTemp !== undefined ? `${device.lastWiredTemp.toFixed(1)}°C` : '--'}
+                                    </p>
+                                </div>
+
+                                {/* Wireless Sensor Box */}
+                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-emerald-500/10 relative overflow-hidden group/ble">
+                                    <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/ble:opacity-100 transition-opacity">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]"></div>
+                                    </div>
+                                    <p className="text-[9px] sm:text-[10px] text-emerald-300/60 uppercase font-black tracking-widest mb-1">WIRELESS</p>
+                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastBleTemp !== undefined ? 'text-emerald-400' : 'text-slate-700'}`}>
+                                        {device.lastBleTemp !== undefined ? `${device.lastBleTemp.toFixed(1)}°C` : '--'}
+                                    </p>
+                                </div>
+
+                                {/* Humidity Banner */}
+                                {device.lastBleHumidity !== undefined && (
+                                    <div className="col-span-2 bg-gradient-to-r from-slate-950/80 to-slate-900/80 rounded-xl p-2.5 sm:p-3 border border-white/5 flex justify-between items-center group/hum">
+                                        <span className="text-[9px] sm:text-[10px] text-slate-500 uppercase font-black tracking-widest pl-1">HUMIDITY</span>
+                                        <div className="flex items-center gap-2 pr-1">
+                                            <span className="text-xl sm:text-2xl filter drop-shadow-[0_0_3px_rgba(56,189,248,0.5)]">💧</span>
+                                            <span className="font-mono font-bold text-lg sm:text-xl text-sky-400 group-hover/hum:text-sky-300 transition-colors">
+                                                {device.lastBleHumidity.toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer / Summary Metrics */}
+                            <div className="pl-3 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/5 space-y-2 sm:space-y-3">
                                 <div className="flex justify-between text-sm items-center">
-                                    <span className="text-slate-400">Last Seen:</span>
-                                    <span className="text-slate-300 font-medium">
+                                    <span className="text-slate-500 font-medium text-xs sm:text-sm">Last Seen:</span>
+                                    <span className="text-slate-300 font-mono text-[10px] sm:text-xs bg-slate-800/50 px-2 py-0.5 rounded">
                                         {timeAgo(device.lastSeenAt)}
                                     </span>
                                 </div>
-                                <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-slate-500">Signal</span>
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-500 text-xs font-medium">Signal Strength</span>
+                                    <div className="scale-90 origin-right opacity-80 group-hover:opacity-100 transition-opacity">
                                         <SignalIcon rssi={device.lastSignalStrength} />
                                     </div>
-                                    {showBattery && (
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="text-slate-500">Battery (BLE)</span>
-                                            <BatteryIcon level={device.lastBleBattery!} />
-                                        </div>
-                                    )}
                                 </div>
+
+                                {showBattery && (
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-500 text-xs font-medium">Battery (BLE)</span>
+                                        <div className="flex items-center gap-2">
+                                            <BatteryIcon level={device.lastBleBattery!} />
+                                            <span className={`text-xs font-mono font-bold ${device.lastBleBattery! < 20 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                {device.lastBleBattery}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     );
                 })}
-            </div>
+            </div >
 
             {selectedDevice && (
                 <DeviceDetailModal
                     device={selectedDevice}
                     onClose={() => setSelectedDeviceId(null)}
                 />
-            )}
+            )
+            }
 
 
         </>
     );
 }
-
-

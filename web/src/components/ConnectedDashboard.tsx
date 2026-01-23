@@ -10,14 +10,14 @@ import { Plus, Server, Activity, AlertTriangle, Thermometer } from "lucide-react
 
 function StatCard({ label, value, subtext, icon, color }: { label: string, value: string | number, subtext?: string, icon: any, color: string }) {
     return (
-        <div className="glass-card p-5 relative overflow-hidden group">
+        <div className="glass-card p-4 sm:p-5 relative overflow-hidden group">
             <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity ${color}`}>
                 {icon}
             </div>
             <div className="relative z-10">
                 <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{label}</p>
-                <div className="text-2xl font-bold text-white mb-1">{value}</div>
-                {subtext && <p className={`text-xs ${color} font-medium`}>{subtext}</p>}
+                <div className="text-xl sm:text-2xl font-bold text-white mb-1">{value}</div>
+                {subtext && <p className={`text-[10px] sm:text-xs ${color} font-medium`}>{subtext}</p>}
             </div>
         </div>
     );
@@ -32,7 +32,9 @@ function DashboardContent() {
         total: 0,
         online: 0,
         attention: 0,
-        avgTemp: 0
+        avgWiredTemp: 0,
+        avgBleTemp: 0,
+        avgHumidity: 0
     };
 
     if (devices) {
@@ -40,13 +42,37 @@ function DashboardContent() {
         stats.online = devices.filter(d => d.lastDeviceStatus !== "offline" && d.lastDeviceStatus !== "unknown").length;
         stats.attention = devices.filter(d => d.lastDeviceStatus === "offline" || d.lastDeviceStatus === "degraded").length;
 
-        const temps = devices
-            .map(d => d.lastWiredTemp ?? d.lastBleTemp)
-            .filter(t => t !== undefined && t !== null) as number[];
+        // Calculate Averages
+        let totalWired = 0;
+        let countWired = 0;
+        let totalBle = 0;
+        let countBle = 0;
+        let totalHum = 0;
+        let countHum = 0;
 
-        if (temps.length > 0) {
-            stats.avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;
-        }
+        devices.forEach(d => {
+            // Wired Temp (DS18B20)
+            if (d.lastWiredTemp !== undefined) {
+                totalWired += d.lastWiredTemp;
+                countWired++;
+            }
+
+            // BLE Temp
+            if (d.lastBleTemp !== undefined) {
+                totalBle += d.lastBleTemp;
+                countBle++;
+            }
+
+            // Humidity
+            if (d.lastBleHumidity !== undefined) {
+                totalHum += d.lastBleHumidity;
+                countHum++;
+            }
+        });
+
+        if (countWired > 0) stats.avgWiredTemp = totalWired / countWired;
+        if (countBle > 0) stats.avgBleTemp = totalBle / countBle;
+        if (countHum > 0) stats.avgHumidity = totalHum / countHum;
     }
 
     return (
@@ -68,7 +94,7 @@ function DashboardContent() {
             </div>
 
             {/* Summary Statistics Row */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                 <StatCard
                     label="Total Devices"
                     value={stats.total}
@@ -90,11 +116,25 @@ function DashboardContent() {
                     icon={<AlertTriangle className="w-12 h-12" />}
                 />
                 <StatCard
-                    label="Avg. Temperature"
-                    value={stats.avgTemp ? `${stats.avgTemp.toFixed(1)}°C` : "--"}
-                    subtext="Across all units"
-                    color="text-blue-400"
+                    label="Wired Avg."
+                    value={stats.avgWiredTemp ? `${stats.avgWiredTemp.toFixed(1)}°C` : "--"}
+                    subtext="DS18B20 Sensors"
+                    color="text-indigo-400"
                     icon={<Thermometer className="w-12 h-12" />}
+                />
+                <StatCard
+                    label="Wireless Avg."
+                    value={stats.avgBleTemp ? `${stats.avgBleTemp.toFixed(1)}°C` : "--"}
+                    subtext="BLE Sensors"
+                    color="text-emerald-400"
+                    icon={<Thermometer className="w-12 h-12" />}
+                />
+                <StatCard
+                    label="Avg. Humidity"
+                    value={stats.avgHumidity ? `${stats.avgHumidity.toFixed(1)}%` : "--"}
+                    subtext="BLE sensors only"
+                    color="text-sky-400"
+                    icon={<span className="text-4xl">💧</span>}
                 />
             </div>
 

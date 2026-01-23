@@ -63,7 +63,6 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
     const chartRef = useRef<ChartJS | null>(null);
 
     // Calculate startTime based on selected range
-    // Calculate startTime based on selected range
     const startTime = useMemo(() => {
         if (timeRange === 'CUSTOM' && customStartTime) return customStartTime;
 
@@ -123,44 +122,56 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
         return allData;
     }, [telemetry]);
 
-    // Calculate statistics
+    // Calculate statistics (ADVANCED VERSION)
     const statistics = useMemo(() => {
         if (!chartData) return null;
 
-        const wiredTemps = chartData
-            .map(d => d.wiredTemp)
-            .filter((t): t is number => t !== null && t > -50);
+        const calculateMetricStats = (dataPoints: { val: number | null, time: number }[]) => {
+            const validPoints = dataPoints.filter((d): d is { val: number, time: number } => d.val !== null);
+            if (validPoints.length === 0) return null;
 
-        const bleTemps = chartData
-            .map(d => d.bleTemp)
-            .filter((t): t is number => t !== null && t > -50);
+            const values = validPoints.map(d => d.val);
+            const sum = values.reduce((a, b) => a + b, 0);
+            const avg = sum / values.length;
 
-        const allTemps = [...wiredTemps, ...bleTemps];
+            // Standard Deviation for Stability
+            const squareDiffs = values.map(value => Math.pow(value - avg, 2));
+            const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / values.length;
+            const stdDev = Math.sqrt(avgSquareDiff);
 
-        const alerts = allTemps.filter(t =>
-            (minTemp !== undefined && t < minTemp) ||
-            (maxTemp !== undefined && t > maxTemp)
-        ).length;
+            // Min/Max with Timestamps
+            const min = validPoints.reduce((prev, curr) => curr.val < prev.val ? curr : prev);
+            const max = validPoints.reduce((prev, curr) => curr.val > prev.val ? curr : prev);
 
-        return {
-            wired: {
-                min: wiredTemps.length > 0 ? Math.min(...wiredTemps) : null,
-                max: wiredTemps.length > 0 ? Math.max(...wiredTemps) : null,
-                avg: wiredTemps.length > 0 ? wiredTemps.reduce((a, b) => a + b) / wiredTemps.length : null,
-            },
-            ble: {
-                min: bleTemps.length > 0 ? Math.min(...bleTemps) : null,
-                max: bleTemps.length > 0 ? Math.max(...bleTemps) : null,
-                avg: bleTemps.length > 0 ? bleTemps.reduce((a, b) => a + b) / bleTemps.length : null,
-            },
-            overall: {
-                min: allTemps.length > 0 ? Math.min(...allTemps) : null,
-                max: allTemps.length > 0 ? Math.max(...allTemps) : null,
-                avg: allTemps.length > 0 ? allTemps.reduce((a, b) => a + b) / allTemps.length : null,
-            },
-            alerts,
-            readingCount: chartData.length,
+            // Time in Range
+            let safeCount = 0;
+            if (minTemp !== undefined || maxTemp !== undefined) {
+                safeCount = validPoints.filter(d => {
+                    if (minTemp !== undefined && d.val < minTemp) return false;
+                    if (maxTemp !== undefined && d.val > maxTemp) return false;
+                    return true;
+                }).length;
+            } else {
+                safeCount = validPoints.length; // If no limits, all are safe
+            }
+            const timeInRange = (safeCount / validPoints.length) * 100;
+
+            return {
+                current: values[values.length - 1],
+                min,
+                max,
+                avg,
+                stdDev,
+                timeInRange,
+                count: validPoints.length
+            };
         };
+
+        const wiredStats = calculateMetricStats(chartData.map(d => ({ val: (d.wiredTemp !== null && d.wiredTemp > -50) ? d.wiredTemp : null, time: d.time })));
+        const bleStats = calculateMetricStats(chartData.map(d => ({ val: (d.bleTemp !== null && d.bleTemp > -50) ? d.bleTemp : null, time: d.time })));
+        const humidityStats = calculateMetricStats(chartData.map(d => ({ val: d.humidity, time: d.time })));
+
+        return { wired: wiredStats, ble: bleStats, humidity: humidityStats };
     }, [chartData, minTemp, maxTemp]);
 
     // Export functions
@@ -210,6 +221,106 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
         a.href = url;
         a.download = `${deviceName}_${timeRange}_chart.png`;
         a.click();
+    };
+
+    // Helper for Stability Label
+    const getStabilityLabel = (stdDev: number) => {
+        if (stdDev < 0.5) return { label: 'High', color: 'text-emerald-400', bg: 'bg-emerald-500/10' };
+        if (stdDev < 1.5) return { label: 'Medium', color: 'text-yellow-400', bg: 'bg-yellow-500/10' };
+        return { label: 'Low', color: 'text-red-400', bg: 'bg-red-500/10' };
+    };
+
+    // Helper for Time Format
+    const formatTime = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Internal Row Component
+    const StatsRow = ({ label, icon, color, stats, isHumidity = false }: { label: string, icon: any, color: string, stats: any, isHumidity?: boolean }) => {
+        if (!stats) return null;
+
+        const stability = !isHumidity ? getStabilityLabel(stats.stdDev) : null;
+        const unit = isHumidity ? '%' : '°C';
+        const isSafe = stats.timeInRange > 90;
+
+        return (
+            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group">
+                {/* 1. Sensor Name */}
+                <div className="md:col-span-1 flex items-center gap-3">
+                    <div className={`p-2 rounded-lg bg-slate-900/50 ${color}`}>
+                        {icon}
+                    </div>
+                    <span className="font-semibold text-slate-200 text-sm hidden md:block">{label}</span>
+                    <span className="font-semibold text-slate-200 text-sm md:hidden">{label} Sensor</span>
+                </div>
+
+                {/* 2. Current */}
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Current</span>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-lg font-mono font-bold ${color}`}>
+                            {stats.current.toFixed(1)}{unit}
+                        </span>
+                        <span className="relative flex h-2 w-2">
+                            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${color.replace('text-', 'bg-')}`}></span>
+                            <span className={`relative inline-flex rounded-full h-2 w-2 ${color.replace('text-', 'bg-')}`}></span>
+                        </span>
+                    </div>
+                </div>
+
+                {/* 3. Min */}
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Min</span>
+                    <span className="text-sm font-mono font-medium text-white">
+                        {stats.min.val.toFixed(1)}{unit}
+                    </span>
+                    <span className="text-[10px] text-slate-500">{formatTime(stats.min.time)}</span>
+                </div>
+
+                {/* 4. Max */}
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Max</span>
+                    <span className="text-sm font-mono font-medium text-white">
+                        {stats.max.val.toFixed(1)}{unit}
+                    </span>
+                    <span className="text-[10px] text-slate-500">{formatTime(stats.max.time)}</span>
+                </div>
+
+                {/* 5. Average */}
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Avg</span>
+                    <span className="text-sm font-mono font-medium text-slate-300">
+                        {stats.avg.toFixed(1)}{unit}
+                    </span>
+                </div>
+
+                {/* 6. Stability (Temp only) */}
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Stability</span>
+                    {stability ? (
+                        <div className={`px-2 py-0.5 rounded text-xs font-bold w-fit ${stability.bg} ${stability.color}`}>
+                            {stability.label}
+                        </div>
+                    ) : (
+                        <span className="text-slate-600 text-xs">-</span>
+                    )}
+                </div>
+
+                {/* 7. Time in Range */}
+                <div className="md:col-span-1 flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-500 md:hidden">Time in Range</span>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                                className={`h-full rounded-full ${isSafe ? 'bg-emerald-500' : 'bg-red-500'}`}
+                                style={{ width: `${stats.timeInRange}%` }}
+                            />
+                        </div>
+                        <span className={`text-xs font-bold ${isSafe ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {Math.round(stats.timeInRange)}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     // Chart rendering
@@ -373,13 +484,6 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
             },
         };
 
-        // Add alert zone annotations if limits are set
-        if (minTemp !== undefined || maxTemp !== undefined) {
-            // Note: Chart.js doesn't have built-in annotation support
-            // We'd need chartjs-plugin-annotation for visual alert zones
-            // For now, just show in legend/stats
-        }
-
         chartRef.current = new ChartJS(canvasRef.current, config);
 
         return () => {
@@ -476,39 +580,36 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
 
             {/* Statistics Panel */}
             {statistics && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div>
-                        <p className="text-xs text-slate-500 mb-1">Min Temp</p>
-                        <p className="text-lg font-mono font-bold text-blue-400">
-                            {statistics.overall.min !== null ? `${statistics.overall.min.toFixed(1)}°C` : '--'}
-                        </p>
+                <div className="space-y-3">
+                    <div className="hidden md:grid grid-cols-7 gap-4 px-4 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <div className="col-span-1">Sensor</div>
+                        <div className="text-center md:text-left">Current</div>
+                        <div className="text-center md:text-left">Min</div>
+                        <div className="text-center md:text-left">Max</div>
+                        <div className="text-center md:text-left">Average</div>
+                        <div className="text-center md:text-left">Stability</div>
+                        <div className="col-span-1 text-center md:text-left">Safe Range</div>
                     </div>
-                    <div>
-                        <p className="text-xs text-slate-500 mb-1">Max Temp</p>
-                        <p className="text-lg font-mono font-bold text-red-400">
-                            {statistics.overall.max !== null ? `${statistics.overall.max.toFixed(1)}°C` : '--'}
-                        </p>
-                    </div>
-                    <div>
-                        <p className="text-xs text-slate-500 mb-1">Avg Temp</p>
-                        <p className="text-lg font-mono font-bold text-emerald-400">
-                            {statistics.overall.avg !== null ? `${statistics.overall.avg.toFixed(1)}°C` : '--'}
-                        </p>
-                    </div>
-                    <div>
-                        <p className="text-xs text-slate-500 mb-1">Readings</p>
-                        <p className="text-lg font-mono font-bold text-indigo-400">
-                            {statistics.readingCount}
-                        </p>
-                    </div>
-                    {statistics.alerts > 0 && (
-                        <div className="col-span-2 md:col-span-4">
-                            <p className="text-xs text-amber-500 mb-1">⚠️ Alerts</p>
-                            <p className="text-sm text-amber-400">
-                                {statistics.alerts} readings outside safe range
-                            </p>
-                        </div>
-                    )}
+
+                    <StatsRow
+                        label="Wired"
+                        icon={<span className="text-lg">🔌</span>}
+                        color="text-indigo-400"
+                        stats={statistics.wired}
+                    />
+                    <StatsRow
+                        label="Wireless"
+                        icon={<span className="text-lg">📡</span>}
+                        color="text-emerald-400"
+                        stats={statistics.ble}
+                    />
+                    <StatsRow
+                        label="Humidity"
+                        icon={<span className="text-lg">💧</span>}
+                        color="text-sky-400"
+                        stats={statistics.humidity}
+                        isHumidity={true}
+                    />
                 </div>
             )}
 
