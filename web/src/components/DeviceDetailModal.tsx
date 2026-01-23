@@ -184,7 +184,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                         {/* Mini Chart Preview */}
                         <div className="p-4 bg-slate-950/30 rounded-xl border border-white/5">
                             <h4 className="text-sm font-semibold text-slate-300 mb-4">Quick History (Last 24h)</h4>
-                            <div className="h-[200px]"><TemperatureChart deviceName={device.deviceId} /></div>
+                            <div className="h-[200px]"><TemperatureChart deviceName={device.deviceId} minTemp={device.minTemp} maxTemp={device.maxTemp} /></div>
                         </div>
                     </div>
                 )}
@@ -193,7 +193,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                 {activeTab === 'history' && (
                     <div className="h-full flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="flex-1 bg-slate-950/30 rounded-xl border border-white/5 p-4 min-h-[300px]">
-                            <TemperatureChart deviceName={device.deviceId} />
+                            <TemperatureChart deviceName={device.deviceId} minTemp={device.minTemp} maxTemp={device.maxTemp} />
                         </div>
                     </div>
                 )}
