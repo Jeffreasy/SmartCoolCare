@@ -66,7 +66,11 @@ function DeviceTypeIcon({ type }: { type?: string }) {
     }
 }
 
-export default function DeviceCard() {
+interface DeviceCardProps {
+    onAddDevice?: () => void;
+}
+
+export default function DeviceCard(props: DeviceCardProps) {
     const devices = useQuery(api.sensors.getLiveSensors);
     const updateSettings = useMutation(api.devices.updateSettings);
 
@@ -135,9 +139,13 @@ export default function DeviceCard() {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-200 mb-2">No Devices Linked</h3>
                 <p className="text-slate-500 mb-6">Je hebt nog geen apparaten aan je account toegevoegd.</p>
-                <a href="/claim-device" className="btn-primary w-full text-center block pt-3">
+                {/* Use callback if available, otherwise fallback (though primarily we want the modal) */}
+                <button
+                    onClick={props.onAddDevice}
+                    className="btn-primary w-full text-center block pt-3 pb-3 rounded-lg"
+                >
                     + Nieuw Apparaat Koppelen
-                </a>
+                </button>
             </div>
         );
     }
@@ -202,48 +210,54 @@ export default function DeviceCard() {
 
             {selectedDevice && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-md md:p-4 animate-in fade-in duration-200"
                     onClick={() => setSelectedDevice(null)}
                 >
                     <div
-                        className="glass-panel w-full max-w-5xl h-[80vh] p-0 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl flex flex-col overflow-hidden"
+                        className="glass-panel w-full h-[90vh] md:h-[85vh] md:max-w-5xl p-0 relative animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-200 border-t md:border border-white/10 shadow-2xl bg-slate-900/95 rounded-t-2xl md:rounded-2xl flex flex-col overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header & Navigation */}
-                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-900/95 shrink-0">
-                            <div>
-                                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                    <DeviceTypeIcon type={selectedDevice.deviceType} />
-                                    {selectedDevice.displayName || selectedDevice.deviceId}
-                                </h2>
-                                <p className="text-slate-400 text-sm font-mono mt-1">ID: {selectedDevice.deviceId}</p>
+                        <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/95 shrink-0 z-10">
+                            <div className="flex justify-between w-full md:w-auto items-center">
+                                <div>
+                                    <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                                        <DeviceTypeIcon type={selectedDevice.deviceType} />
+                                        {selectedDevice.displayName || selectedDevice.deviceId}
+                                    </h2>
+                                    <p className="text-slate-400 text-xs md:text-sm font-mono mt-1">ID: {selectedDevice.deviceId}</p>
+                                </div>
+                                <button onClick={() => setSelectedDevice(null)} className="md:hidden p-2 -mr-2 text-slate-400 hover:text-white">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
                             </div>
-                            <div className="flex gap-2">
+
+                            <div className="flex w-full md:w-auto gap-2">
                                 {/* Tab Navigation */}
-                                <div className="flex bg-slate-800 rounded-lg p-1">
+                                <div className="flex flex-1 md:flex-none bg-slate-800 rounded-lg p-1">
                                     {(['overview', 'history', 'settings'] as const).map((tab) => (
                                         <button
                                             key={tab}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            className={`flex-1 md:flex-none px-3 py-1.5 md:px-4 md:py-2 rounded-md text-xs md:text-sm font-medium transition-all ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5'
                                                 }`}
                                         >
                                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                                         </button>
                                     ))}
                                 </div>
-                                <button onClick={() => setSelectedDevice(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white ml-4">
+                                <button onClick={() => setSelectedDevice(null)} className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white ml-2">
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
                             </div>
                         </div>
 
                         {/* Modal Body */}
-                        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar pb-20 md:pb-6">
 
                             {/* TAB: OVERVIEW */}
                             {activeTab === 'overview' && (
-                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         {/* Wired Sensor */}
                                         <div className="bg-white/5 border border-white/10 rounded-xl p-5 relative overflow-hidden group">
@@ -292,7 +306,7 @@ export default function DeviceCard() {
                             {activeTab === 'history' && (
                                 <div className="h-full flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
                                     <h3 className="text-xl font-bold text-white mb-4">Temperature & Humidity Logs</h3>
-                                    <div className="flex-1 bg-slate-950/30 rounded-xl border border-white/5 p-4">
+                                    <div className="flex-1 bg-slate-950/30 rounded-xl border border-white/5 p-4 min-h-[300px]">
                                         <TemperatureChart deviceName={selectedDevice.deviceId} />
                                     </div>
                                 </div>
@@ -321,12 +335,12 @@ export default function DeviceCard() {
                                                             key={type}
                                                             onClick={() => setSettingsForm({ ...settingsForm, deviceType: type })}
                                                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${settingsForm.deviceType === type
-                                                                    ? 'bg-indigo-600 border-indigo-500 text-white'
-                                                                    : 'bg-slate-950 border-white/10 text-slate-400 hover:border-white/30'
+                                                                ? 'bg-indigo-600 border-indigo-500 text-white'
+                                                                : 'bg-slate-950 border-white/10 text-slate-400 hover:border-white/30'
                                                                 }`}
                                                         >
                                                             <DeviceTypeIcon type={type} />
-                                                            <span className="capitalize">{type}</span>
+                                                            <span className="capitalize hidden md:inline">{type}</span>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -337,7 +351,7 @@ export default function DeviceCard() {
                                     <section>
                                         <h3 className="text-lg font-semibold text-white mb-4 border-b border-white/10 pb-2">Alert Thresholds</h3>
                                         <p className="text-sm text-slate-500 mb-4">Receive notifications when temperature goes outside this range.</p>
-                                        <div className="grid grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-400 mb-2">Min Temperature (°C)</label>
                                                 <input
@@ -361,7 +375,7 @@ export default function DeviceCard() {
 
                                     <section>
                                         <h3 className="text-lg font-semibold text-white mb-4 border-b border-white/10 pb-2">Sensor Calibration</h3>
-                                        <div className="grid grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-400 mb-2">Wired Offset (°C)</label>
                                                 <input
@@ -385,10 +399,10 @@ export default function DeviceCard() {
                                         </div>
                                     </section>
 
-                                    <div className="flex justify-end pt-4">
+                                    <div className="flex justify-end pt-4 pb-12 md:pb-0">
                                         <button
                                             onClick={handleSaveSettings}
-                                            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95"
+                                            className="w-full md:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95"
                                         >
                                             Save Changes
                                         </button>
@@ -397,10 +411,10 @@ export default function DeviceCard() {
                             )}
 
                         </div>
-                        {/* Footer? Maybe close button on mobile */}
                     </div>
                 </div>
             )}
         </div>
     );
 }
+

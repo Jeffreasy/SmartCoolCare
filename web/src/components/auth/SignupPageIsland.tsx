@@ -5,7 +5,7 @@ import { clerkDeepGlassTheme } from "../../lib/clerkTheme";
 export default function SignupPageIsland() {
     return (
         <ConvexAuthProvider>
-            <div className="flex justify-center items-center w-full">
+            <div className="flex justify-center items-center w-full p-4">
                 <SignUp
                     signInUrl="/login"
                     forceRedirectUrl="/dashboard"

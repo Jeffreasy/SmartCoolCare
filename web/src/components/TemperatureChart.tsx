@@ -234,17 +234,17 @@ export default function TemperatureChart({ deviceName }: TemperatureChartProps) 
     const latestBle = telemetry.ble?.[0]?.temperature;
 
     return (
-        <div className="glass-card p-4 relative w-full h-[450px] flex flex-col">
-            <div className="flex justify-center gap-8 mb-4">
+        <div className="glass-card p-4 relative w-full h-[300px] md:h-[450px] flex flex-col">
+            <div className="flex justify-center gap-4 md:gap-8 mb-4">
                 <div className="flex flex-col items-center">
-                    <span className="text-xs text-indigo-400 font-bold uppercase tracking-wider">Wired (DS18B20)</span>
-                    <span className={`text-xl font-mono font-bold ${latestWired === -127 ? 'text-red-500' : 'text-slate-200'}`}>
+                    <span className="text-[10px] md:text-xs text-indigo-400 font-bold uppercase tracking-wider">Wired</span>
+                    <span className={`text-lg md:text-xl font-mono font-bold ${latestWired === -127 ? 'text-red-500' : 'text-slate-200'}`}>
                         {latestWired !== undefined ? `${latestWired.toFixed(1)}°C` : '--'}
                     </span>
                 </div>
                 <div className="flex flex-col items-center">
-                    <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider">BLE Sensor</span>
-                    <span className="text-xl font-mono font-bold text-slate-200">
+                    <span className="text-[10px] md:text-xs text-emerald-400 font-bold uppercase tracking-wider">Wireless</span>
+                    <span className="text-lg md:text-xl font-mono font-bold text-slate-200">
                         {latestBle !== undefined ? `${latestBle.toFixed(1)}°C` : '--'}
                     </span>
                 </div>

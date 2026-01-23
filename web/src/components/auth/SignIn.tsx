@@ -2,7 +2,7 @@ import { SignIn } from "@clerk/clerk-react";
 
 export default function SignInPage() {
     return (
-        <div className="flex justify-center items-center w-full">
+        <div className="flex justify-center items-center w-full p-4">
             <SignIn signUpUrl="/signup" forceRedirectUrl="/dashboard" />
         </div>
     );

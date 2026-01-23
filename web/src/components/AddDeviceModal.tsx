@@ -72,7 +72,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
             onClick={handleClose}
         >
             <div
-                className="glass-panel w-full max-w-md p-8 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl"
+                className="glass-panel w-full max-w-md p-6 md:p-8 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl mx-4"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
