@@ -26,6 +26,11 @@ export default function MobileDrawer({
             document.body.style.overflow = "unset";
             return () => clearTimeout(timer);
         }
+
+        // Cleanup: ensure we unlock scroll if we unmount while open
+        return () => {
+            document.body.style.overflow = "unset";
+        };
     }, [isOpen]);
 
     if (!mount) return null;
