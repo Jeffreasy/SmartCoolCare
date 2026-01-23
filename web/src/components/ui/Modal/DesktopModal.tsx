@@ -1,0 +1,63 @@
+import { useEffect } from "react";
+import { X } from "lucide-react";
+
+interface DesktopModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    title?: React.ReactNode;
+    maxWidth?: string;
+}
+
+export default function DesktopModal({
+    isOpen,
+    onClose,
+    children,
+    title,
+    maxWidth = "max-w-2xl"
+}: DesktopModalProps) {
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
+        if (isOpen) {
+            document.addEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "hidden";
+        }
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "unset";
+        };
+    }, [isOpen, onClose]);
+
+    if (!isOpen) return null;
+
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
+            onClick={onClose}
+        >
+            <div
+                className={`glass-panel w-full ${maxWidth} p-6 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl flex flex-col max-h-[90vh]`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-6 shrink-0">
+                    <div className="text-xl font-bold text-white">{title}</div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
+                        aria-label="Close modal"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+}

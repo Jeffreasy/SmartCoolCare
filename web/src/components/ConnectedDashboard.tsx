@@ -6,6 +6,7 @@ import DebugAuth from "./DebugAuth";
 import ConvexAuthProvider from "./ConvexAuthProvider";
 import AddDeviceModal from "./AddDeviceModal";
 import { useState } from "react";
+import { Plus, Server, Activity, AlertTriangle, Thermometer } from "lucide-react";
 
 function StatCard({ label, value, subtext, icon, color }: { label: string, value: string | number, subtext?: string, icon: any, color: string }) {
     return (
@@ -57,7 +58,7 @@ function DashboardContent() {
                         onClick={() => setIsAddDeviceOpen(true)}
                         className="flex-1 sm:flex-none justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                        <Plus className="w-4 h-4" />
                         <span>Add Device</span>
                     </button>
                     <span className="hidden sm:block w-px h-6 bg-white/10 mx-1"></span>
@@ -72,28 +73,28 @@ function DashboardContent() {
                     label="Total Devices"
                     value={stats.total}
                     color="text-indigo-400"
-                    icon={<svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>}
+                    icon={<Server className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Active & Online"
                     value={stats.online}
                     subtext={`${stats.total > 0 ? Math.round((stats.online / stats.total) * 100) : 0}% Operational`}
                     color="text-emerald-400"
-                    icon={<svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                    icon={<Activity className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Attention Needed"
                     value={stats.attention}
                     subtext={stats.attention > 0 ? "Check alerts below" : "All systems normal"}
                     color={stats.attention > 0 ? "text-red-400" : "text-emerald-400"}
-                    icon={<svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
+                    icon={<AlertTriangle className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Avg. Temperature"
                     value={stats.avgTemp ? `${stats.avgTemp.toFixed(1)}°C` : "--"}
                     subtext="Across all units"
                     color="text-blue-400"
-                    icon={<svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" /></svg>}
+                    icon={<Thermometer className="w-12 h-12" />}
                 />
             </div>
 

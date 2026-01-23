@@ -32,7 +32,7 @@ export default function DebugAuth() {
     }, [clerkSignedIn, getToken]);
 
     return (
-        <div className="fixed bottom-2 right-2 z-[9999] bg-slate-900/90 text-white p-4 rounded text-xs opacity-90 text-left backdrop-blur-sm border border-slate-700 shadow-lg font-mono pointer-events-auto">
+        <div className="fixed bottom-2 right-2 z-[9999] glass-panel bg-slate-900/90 p-4 text-xs text-left font-mono pointer-events-auto min-w-[200px]">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div className="text-slate-400">Convex:</div>
                 <div className={convexAuth ? "text-success" : "text-danger"}>

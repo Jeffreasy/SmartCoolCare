@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { ResponsiveModal } from "./ui/Modal";
+import { Cpu, CheckCircle } from "lucide-react";
 
 interface AddDeviceModalProps {
     isOpen: boolean;
@@ -67,21 +69,15 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
     };
 
     return (
-        <div
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-            onClick={handleClose}
-        >
-            <div
-                className="glass-panel w-full max-w-md p-6 md:p-8 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl mx-4"
-                onClick={(e) => e.stopPropagation()}
-            >
+        <ResponsiveModal isOpen={isOpen} onClose={handleClose}>
+            <div className="space-y-6">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
                         {step === 3 ? (
-                            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            <CheckCircle className="w-8 h-8 text-emerald-400" />
                         ) : (
-                            <svg className="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            <Cpu className="w-8 h-8 text-indigo-400" />
                         )}
                     </div>
                     <h2 className="text-2xl font-bold text-white">
@@ -139,17 +135,17 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                     <div className="flex gap-3 pt-2">
                         {step === 1 && (
                             <>
-                                <button onClick={handleClose} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-colors font-medium">Cancel</button>
-                                <button onClick={handleNext} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium shadow-lg shadow-indigo-500/20">Next</button>
+                                <button onClick={handleClose} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-all duration-200 font-medium cursor-pointer">Cancel</button>
+                                <button onClick={handleNext} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-indigo-500/20 cursor-pointer">Next</button>
                             </>
                         )}
                         {step === 2 && (
                             <>
-                                <button onClick={() => setStep(1)} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-colors font-medium">Back</button>
+                                <button onClick={() => setStep(1)} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-all duration-200 font-medium cursor-pointer">Back</button>
                                 <button
                                     onClick={handleSubmit}
                                     disabled={isLoading}
-                                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     {isLoading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                                     Claim Device
@@ -157,13 +153,13 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                             </>
                         )}
                         {step === 3 && (
-                            <button onClick={handleClose} className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg transition-colors font-medium shadow-lg shadow-emerald-500/20">
+                            <button onClick={handleClose} className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-emerald-500/20 cursor-pointer">
                                 Go to Dashboard
                             </button>
                         )}
                     </div>
                 </div>
             </div>
-        </div>
+        </ResponsiveModal>
     );
 }

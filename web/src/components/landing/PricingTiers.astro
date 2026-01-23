@@ -1,5 +1,6 @@
 ---
 import Tilt3D from "../ui/Tilt3D.astro";
+import { Check } from "lucide-react";
 const plans = [
     {
         name: "Basis",
@@ -94,19 +95,9 @@ const plans = [
                             <ul class="space-y-4 mb-8 flex-1 transform transition-transform duration-500 group-hover:translate-z-10">
                                 {plan.features.map((feature) => (
                                     <li class="flex items-center gap-3 text-slate-300 text-sm">
-                                        <svg
-                                            class={`w-5 h-5 flex-shrink-0 ${plan.color}`}
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M5 13l4 4L19 7"
-                                            />
-                                        </svg>
+                                        <Check
+                                            className={`w-5 h-5 flex-shrink-0 ${plan.color}`}
+                                        />
                                         {feature}
                                     </li>
                                 ))}

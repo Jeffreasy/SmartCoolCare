@@ -1,5 +1,6 @@
 ---
 import Tilt3D from "../ui/Tilt3D.astro";
+import { Thermometer, Cpu, Cloud, LayoutDashboard } from "lucide-react";
 ---
 
 <section
@@ -29,19 +30,7 @@ import Tilt3D from "../ui/Tilt3D.astro";
                     <div
                         class="w-16 h-16 mx-auto bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 text-indigo-400 transform transition-transform duration-500 group-hover:translate-z-20 group-hover:scale-110"
                     >
-                        <svg
-                            class="w-8 h-8"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                            ></path>
-                        </svg>
+                        <Thermometer className="w-8 h-8" />
                     </div>
                     <h3
                         class="text-lg font-bold text-white mb-2 transform transition-transform duration-500 group-hover:translate-z-10"
@@ -63,18 +52,7 @@ import Tilt3D from "../ui/Tilt3D.astro";
                     <div
                         class="w-16 h-16 mx-auto bg-purple-500/10 rounded-full flex items-center justify-center mb-4 text-purple-400 transform transition-transform duration-500 group-hover:translate-z-20 group-hover:scale-110"
                     >
-                        <svg
-                            class="w-8 h-8"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                        <Cpu className="w-8 h-8" />
                     </div>
                     <h3
                         class="text-lg font-bold text-white mb-2 transform transition-transform duration-500 group-hover:translate-z-10"
@@ -96,19 +74,7 @@ import Tilt3D from "../ui/Tilt3D.astro";
                     <div
                         class="w-16 h-16 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center mb-4 text-blue-400 transform transition-transform duration-500 group-hover:translate-z-20 group-hover:scale-110"
                     >
-                        <svg
-                            class="w-8 h-8"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-                            ></path>
-                        </svg>
+                        <Cloud className="w-8 h-8" />
                     </div>
                     <h3
                         class="text-lg font-bold text-white mb-2 transform transition-transform duration-500 group-hover:translate-z-10"
@@ -130,19 +96,7 @@ import Tilt3D from "../ui/Tilt3D.astro";
                     <div
                         class="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 text-emerald-400 transform transition-transform duration-500 group-hover:translate-z-20 group-hover:scale-110"
                     >
-                        <svg
-                            class="w-8 h-8"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                            ></path>
-                        </svg>
+                        <LayoutDashboard className="w-8 h-8" />
                     </div>
                     <h3
                         class="text-lg font-bold text-white mb-2 transform transition-transform duration-500 group-hover:translate-z-10"
