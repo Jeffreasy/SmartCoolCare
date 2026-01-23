@@ -50,16 +50,21 @@ http.route({
             logs: logs ?? undefined
         });
 
-        // Fetch latest config (calibration)
+        // Fetch latest config (calibration) from device record
         const deviceConfig = await ctx.runQuery(api.sensors.getDeviceConfig, {
+            sensorId
+        });
+
+        // Fetch device record for sleep settings (if custom per-device later)
+        const deviceRecord = await ctx.runQuery(api.sensors.getDeviceRecord, {
             sensorId
         });
 
         return new Response(JSON.stringify({
             config: {
-                sleepDuration: 300,
-                scanDuration: 10,
-                // Send offsets if set
+                sleepDuration: deviceRecord?.sleepDuration || 300, // Default 5 min
+                scanDuration: deviceRecord?.scanDuration || 10,    // Default 10 sec
+                // Send calibration offsets
                 tempOffsetWired: deviceConfig?.tempOffsetWired ?? 0,
                 tempOffsetBle: deviceConfig?.tempOffsetBle ?? 0
             }

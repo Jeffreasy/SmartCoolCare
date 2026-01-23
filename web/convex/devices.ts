@@ -70,11 +70,15 @@ export const claim = mutation({
             throw new Error("Device has not reported MAC address yet. Ensure it is powered on.");
         }
 
-        // MAC Verification
+        // MAC Verification (Strengthened: 8 char minimum)
         const dbMac = device.hardwareMac.toLowerCase().replace(/[^a-z0-9]/g, "");
         const inputMac = args.macVerify.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-        if (!dbMac.includes(inputMac) || inputMac.length < 4) {
+        if (inputMac.length < 8) {
+            throw new Error("MAC verification requires at least 8 characters (e.g., last 8 digits of MAC address).");
+        }
+
+        if (!dbMac.includes(inputMac)) {
             throw new Error("MAC verification failed. Please check the device label.");
         }
 
@@ -131,6 +135,8 @@ export const updateSettings = mutation({
         maxTemp: v.optional(v.number()),
         tempOffsetWired: v.optional(v.number()),
         tempOffsetBle: v.optional(v.number()),
+        sleepDuration: v.optional(v.number()), // In seconds
+        scanDuration: v.optional(v.number()),  // In seconds
     },
     handler: async (ctx, args) => {
         const hasPermission = await canEditDevice(ctx, args.deviceId);
@@ -145,12 +151,28 @@ export const updateSettings = mutation({
 
         if (!device) throw new Error("Device not found");
 
+        // Validation: Sleep Duration (1-5 minutes = 60-300 seconds)
+        if (args.sleepDuration !== undefined) {
+            if (args.sleepDuration < 60 || args.sleepDuration > 300) {
+                throw new Error("Sleep duration must be between 1 and 5 minutes (60-300 seconds)");
+            }
+        }
+
+        // Validation: Scan Duration (5-15 seconds)
+        if (args.scanDuration !== undefined) {
+            if (args.scanDuration < 5 || args.scanDuration > 15) {
+                throw new Error("Scan duration must be between 5 and 15 seconds");
+            }
+        }
+
         // Construct update object
         const updateFields: any = {};
         if (args.displayName !== undefined) updateFields.displayName = args.displayName;
         if (args.deviceType !== undefined) updateFields.deviceType = args.deviceType;
         if (args.minTemp !== undefined) updateFields.minTemp = args.minTemp;
         if (args.maxTemp !== undefined) updateFields.maxTemp = args.maxTemp;
+        if (args.sleepDuration !== undefined) updateFields.sleepDuration = args.sleepDuration;
+        if (args.scanDuration !== undefined) updateFields.scanDuration = args.scanDuration;
 
         // Handle Config Object separately to merge or overwrite
         if (args.tempOffsetWired !== undefined || args.tempOffsetBle !== undefined) {

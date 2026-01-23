@@ -19,18 +19,27 @@ export const checkDeadDevices = internalMutation({
         const now = Date.now();
         const thirtyMinutesAgo = now - (30 * 60 * 1000);
 
-        // Find devices seen > 30 mins ago that are NOT marked offline
+        // Use new composite index for efficient lookup (no full table scan!)
         const devices = await ctx.db
             .query("devices")
-            .filter((q) =>
-                q.and(
-                    q.lt(q.field("lastSeenAt"), thirtyMinutesAgo),
-                    q.neq(q.field("lastDeviceStatus"), "offline")
-                )
+            .withIndex("by_status_time", (q) =>
+                q.eq("lastDeviceStatus", "healthy")
+                    .lt("lastSeenAt", thirtyMinutesAgo)
             )
             .collect();
 
-        for (const device of devices) {
+        // Also check "degraded" devices
+        const degradedDevices = await ctx.db
+            .query("devices")
+            .withIndex("by_status_time", (q) =>
+                q.eq("lastDeviceStatus", "degraded")
+                    .lt("lastSeenAt", thirtyMinutesAgo)
+            )
+            .collect();
+
+        const allStaleDevices = [...devices, ...degradedDevices];
+
+        for (const device of allStaleDevices) {
             // Mark as offline
             await ctx.db.patch(device._id, {
                 lastDeviceStatus: "offline"

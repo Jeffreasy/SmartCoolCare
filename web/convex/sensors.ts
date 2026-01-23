@@ -184,6 +184,19 @@ export const getDeviceConfig = query({
 });
 
 // ========================================================================
+// 1c. GET FULL DEVICE RECORD (For Dynamic Config)
+// ========================================================================
+export const getDeviceRecord = query({
+    args: { sensorId: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("devices")
+            .withIndex("by_deviceId", (q) => q.eq("deviceId", args.sensorId))
+            .unique();
+    }
+});
+
+// ========================================================================
 // 2. GET DASHBOARD DEVICES (Single Query for All Info!)
 // ========================================================================
 import { getUserRole } from "./permissions";
@@ -225,7 +238,11 @@ export const getLiveSensors = query({
 // 3. GET TEMPERATURE HISTORY (Wired + BLE)
 // ========================================================================
 export const getHistory = query({
-    args: { sensorId: v.string() },
+    args: {
+        sensorId: v.string(),
+        startTime: v.optional(v.number()), // Timestamp in ms (default: last 24h)
+        limit: v.optional(v.number()),     // Max records (default: 500)
+    },
     handler: async (ctx, args) => {
         const userId = await getCurrentUserId(ctx);
 
@@ -247,19 +264,25 @@ export const getHistory = query({
             throw new Error("Unauthorized: You don't own this device");
         }
 
+        // Default: last 24 hours
+        const startTime = args.startTime || (Date.now() - 24 * 60 * 60 * 1000);
+        const limit = args.limit || 500;
+
         // Get both wired AND BLE readings in parallel
         const [wiredData, bleData] = await Promise.all([
             ctx.db
                 .query("wiredReadings")
                 .withIndex("by_device", (q) => q.eq("deviceId", args.sensorId))
+                .filter((q) => q.gt(q.field("_creationTime"), startTime))
                 .order("desc")
-                .take(100),
+                .take(limit),
 
             ctx.db
                 .query("bleReadings")
                 .withIndex("by_device", (q) => q.eq("deviceId", args.sensorId))
+                .filter((q) => q.gt(q.field("_creationTime"), startTime))
                 .order("desc")
-                .take(100),
+                .take(limit),
         ]);
 
         return {
@@ -273,7 +296,11 @@ export const getHistory = query({
 // 4. GET HUMIDITY HISTORY (BLE Only)
 // ========================================================================
 export const getHumidityHistory = query({
-    args: { sensorId: v.string() },
+    args: {
+        sensorId: v.string(),
+        startTime: v.optional(v.number()),
+        limit: v.optional(v.number()),
+    },
     handler: async (ctx, args) => {
         const userId = await getCurrentUserId(ctx);
 
@@ -291,11 +318,15 @@ export const getHumidityHistory = query({
             throw new Error("Unauthorized");
         }
 
+        const startTime = args.startTime || (Date.now() - 24 * 60 * 60 * 1000);
+        const limit = args.limit || 500;
+
         return await ctx.db
             .query("bleReadings")
             .withIndex("by_device", (q) => q.eq("deviceId", args.sensorId))
+            .filter((q) => q.gt(q.field("_creationTime"), startTime))
             .order("desc")
-            .take(100);
+            .take(limit);
     },
 });
 

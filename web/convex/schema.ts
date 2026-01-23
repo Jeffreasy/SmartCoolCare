@@ -37,6 +37,10 @@ export default defineSchema({
         deviceType: v.optional(v.string()), // "fridge", "freezer", "wine", etc.
         icon: v.optional(v.string()), // Custom icon override
 
+        // User-Configurable Timing (seconds)
+        sleepDuration: v.optional(v.number()), // Sleep between measurements (60-300s)
+        scanDuration: v.optional(v.number()),  // BLE scan duration (5-15s)
+
         config: v.optional(v.object({
             tempOffsetWired: v.optional(v.number()),
             tempOffsetBle: v.optional(v.number()),
@@ -54,7 +58,8 @@ export default defineSchema({
     })
         .index("by_deviceId", ["deviceId"])
         .index("by_userId", ["userId"])
-        .index("by_mac", ["hardwareMac"]),
+        .index("by_mac", ["hardwareMac"])
+        .index("by_status_time", ["lastDeviceStatus", "lastSeenAt"]), // For cron optimization
 
     // ========================================================================
     // WIRED SENSOR READINGS (DS18B20 Time-Series)
@@ -64,7 +69,7 @@ export default defineSchema({
         temperature: v.number(),  // °C
         userId: v.optional(v.id("users")),
     })
-        .index("by_device", ["deviceId"])
+        .index("by_device", ["deviceId"]) // _creationTime auto-added by Convex
         .index("by_user", ["userId"]),
 
     // ========================================================================
@@ -78,7 +83,7 @@ export default defineSchema({
         signalStrength: v.number(),  // RSSI (dBm)
         userId: v.optional(v.id("users")),
     })
-        .index("by_device", ["deviceId"])
+        .index("by_device", ["deviceId"]) // _creationTime auto-added by Convex
         .index("by_user", ["userId"]),
 
     // ========================================================================

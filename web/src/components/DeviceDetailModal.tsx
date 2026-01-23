@@ -45,6 +45,8 @@ interface Device {
     lastBleTemp?: number;
     lastBleHumidity?: number;
     lastBleBattery?: number;
+    sleepDuration?: number;  // Seconds
+    scanDuration?: number;   // Seconds
     config?: {
         tempOffsetWired?: number;
         tempOffsetBle?: number;
@@ -69,6 +71,8 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
         maxTemp: 10,
         tempOffsetWired: 0,
         tempOffsetBle: 0,
+        sleepDuration: 300, // 5 minutes default
+        scanDuration: 10,   // 10 seconds default
     });
 
     useEffect(() => {
@@ -80,6 +84,8 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                 maxTemp: device.maxTemp ?? 50,
                 tempOffsetWired: device.config?.tempOffsetWired ?? 0,
                 tempOffsetBle: device.config?.tempOffsetBle ?? 0,
+                sleepDuration: device.sleepDuration ?? 300,
+                scanDuration: device.scanDuration ?? 10,
             });
         }
     }, [device]);
@@ -95,6 +101,8 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                 maxTemp: Number(settingsForm.maxTemp),
                 tempOffsetWired: Number(settingsForm.tempOffsetWired),
                 tempOffsetBle: Number(settingsForm.tempOffsetBle),
+                sleepDuration: Number(settingsForm.sleepDuration),
+                scanDuration: Number(settingsForm.scanDuration),
             });
             toast.success("Settings saved successfully!");
         } catch (error) {
@@ -275,6 +283,172 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                     />
                                 </div>
                             </div>
+                        </section>
+
+                        <section>
+                            <h3 className="text-lg font-semibold text-white mb-4 border-b border-white/10 pb-2">Measurement Frequency</h3>
+                            <p className="text-sm text-slate-500 mb-4">Choose how often your device measures and reports data.</p>
+
+                            {/* Preset Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                {/* Quick Test Preset */}
+                                <button
+                                    onClick={() => setSettingsForm({
+                                        ...settingsForm,
+                                        sleepDuration: 60,
+                                        scanDuration: 10
+                                    })}
+                                    className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 60
+                                        ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/20'
+                                        : 'border-white/10 bg-white/5 hover:border-amber-500/50 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className="text-3xl">⚡</span>
+                                        <div>
+                                            <h4 className="font-bold text-white">Quick Test</h4>
+                                            <p className="text-xs text-slate-400">Every 1 minute</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1 text-xs">
+                                        <p className="text-slate-400">📊 Very frequent data</p>
+                                        <p className="text-amber-400">🔋 Heavy battery drain</p>
+                                        <p className="text-slate-500">Best for: Testing & debugging</p>
+                                    </div>
+                                </button>
+
+                                {/* Normal Preset */}
+                                <button
+                                    onClick={() => setSettingsForm({
+                                        ...settingsForm,
+                                        sleepDuration: 180,
+                                        scanDuration: 10
+                                    })}
+                                    className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 180
+                                        ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/20'
+                                        : 'border-white/10 bg-white/5 hover:border-indigo-500/50 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className="text-3xl">⚙️</span>
+                                        <div>
+                                            <h4 className="font-bold text-white">Normal</h4>
+                                            <p className="text-xs text-slate-400">Every 3 minutes</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1 text-xs">
+                                        <p className="text-slate-400">📊 Balanced data</p>
+                                        <p className="text-green-400">🔋 Moderate usage</p>
+                                        <p className="text-slate-500">Best for: Daily monitoring</p>
+                                    </div>
+                                </button>
+
+                                {/* Battery Saver Preset */}
+                                <button
+                                    onClick={() => setSettingsForm({
+                                        ...settingsForm,
+                                        sleepDuration: 300,
+                                        scanDuration: 10
+                                    })}
+                                    className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 300
+                                        ? 'border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/20'
+                                        : 'border-white/10 bg-white/5 hover:border-emerald-500/50 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className="text-3xl">🔋</span>
+                                        <div>
+                                            <h4 className="font-bold text-white">Battery Saver</h4>
+                                            <p className="text-xs text-slate-400">Every 5 minutes</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1 text-xs">
+                                        <p className="text-slate-400">📊 Sufficient data</p>
+                                        <p className="text-emerald-400">🔋 Optimal battery life</p>
+                                        <p className="text-slate-500">Best for: Long-term use</p>
+                                    </div>
+                                </button>
+                            </div>
+
+                            {/* Impact Preview */}
+                            <div className="bg-slate-950/50 rounded-xl p-4 border border-white/5">
+                                <h4 className="text-sm font-semibold text-slate-300 mb-3">Impact Preview</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                    <div>
+                                        <p className="text-slate-500 text-xs mb-1">Data Frequency</p>
+                                        <p className="text-white font-mono">
+                                            Every {Math.floor(settingsForm.sleepDuration / 60)} min
+                                        </p>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            ~{Math.floor((24 * 60) / (settingsForm.sleepDuration / 60))} readings/day
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-slate-500 text-xs mb-1">Battery Life</p>
+                                        <p className="text-white font-mono">
+                                            ~{Math.floor((settingsForm.sleepDuration / 300) * 8)} months
+                                        </p>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            {settingsForm.sleepDuration === 60 && '⚠️ Frequent charging needed'}
+                                            {settingsForm.sleepDuration === 180 && '✓ Good balance'}
+                                            {settingsForm.sleepDuration === 300 && '✓ Maximum efficiency'}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-slate-500 text-xs mb-1">Network Usage</p>
+                                        <p className="text-white font-mono">
+                                            {settingsForm.sleepDuration <= 60 && 'High'}
+                                            {settingsForm.sleepDuration > 60 && settingsForm.sleepDuration < 300 && 'Moderate'}
+                                            {settingsForm.sleepDuration >= 300 && 'Low'}
+                                        </p>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            WiFi activations per day
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Advanced: Custom Settings */}
+                            <details className="mt-4">
+                                <summary className="text-sm text-slate-400 cursor-pointer hover:text-white transition-colors">
+                                    Advanced: Custom Settings
+                                </summary>
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-950/30 rounded-lg border border-white/5">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-2">
+                                            Sleep Duration (seconds)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="60"
+                                            max="300"
+                                            step="30"
+                                            value={settingsForm.sleepDuration}
+                                            onChange={(e) => setSettingsForm({
+                                                ...settingsForm,
+                                                sleepDuration: Number(e.target.value)
+                                            })}
+                                            className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-2">
+                                            Scan Duration (seconds)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="5"
+                                            max="15"
+                                            value={settingsForm.scanDuration}
+                                            onChange={(e) => setSettingsForm({
+                                                ...settingsForm,
+                                                scanDuration: Number(e.target.value)
+                                            })}
+                                            className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                        />
+                                    </div>
+                                </div>
+                            </details>
                         </section>
 
                         <div className="flex justify-end pt-4">
