@@ -2,6 +2,7 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
 import type { ReactNode } from "react";
+import { Toaster } from "sonner";
 
 const convex = new ConvexReactClient(import.meta.env.PUBLIC_CONVEX_URL);
 const publishableKey = import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -27,6 +28,7 @@ export default function ConvexAuthProvider({ children }: { children: ReactNode }
         <ClerkProvider publishableKey={publishableKey}>
             <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
                 {children}
+                <Toaster position="top-right" theme="dark" richColors />
             </ConvexProviderWithClerk>
         </ClerkProvider>
     );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ResponsiveModal } from "./ui/Modal";
@@ -28,12 +29,35 @@ function timeAgo(timestamp: number) {
     return `${Math.floor(hours / 24)}d ago`;
 }
 
+// Strict Device Interface corresponding to Convex schema
+interface Device {
+    _id: Id<"devices">;
+    _creationTime: number;
+    deviceId: string;
+    displayName?: string;
+    deviceType: "fridge" | "freezer" | "wine";
+    minTemp?: number;
+    maxTemp?: number;
+    lastSeenAt: number;
+    lastDeviceStatus: "online" | "offline" | "warning";
+    lastSignalStrength: number;
+    lastWiredTemp?: number;
+    lastBleTemp?: number;
+    lastBleHumidity?: number;
+    lastBleBattery?: number;
+    config?: {
+        tempOffsetWired?: number;
+        tempOffsetBle?: number;
+    };
+}
+
 interface DeviceDetailModalProps {
-    device: any; // Ideally styled via schema, but 'any' matches previous code for now
+    device: any; // Using any to accept the raw Convex object, but casting inside component
     onClose: () => void;
 }
 
-export default function DeviceDetailModal({ device, onClose }: DeviceDetailModalProps) {
+export default function DeviceDetailModal({ device: rawDevice, onClose }: DeviceDetailModalProps) {
+    const device = rawDevice as Device; // Safe cast or structural usage
     const updateSettings = useMutation(api.devices.updateSettings);
     const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'settings'>('overview');
 
@@ -72,10 +96,10 @@ export default function DeviceDetailModal({ device, onClose }: DeviceDetailModal
                 tempOffsetWired: Number(settingsForm.tempOffsetWired),
                 tempOffsetBle: Number(settingsForm.tempOffsetBle),
             });
-            alert("Settings saved successfully!");
+            toast.success("Settings saved successfully!");
         } catch (error) {
             console.error("Failed to save settings:", error);
-            alert("Failed to save settings. Please try again.");
+            toast.error("Failed to save settings.");
         }
     };
 
@@ -109,7 +133,7 @@ export default function DeviceDetailModal({ device, onClose }: DeviceDetailModal
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-[500px] max-h-[80vh] overflow-y-auto custom-scrollbar md:min-h-[600px] relative">
                 {/* TAB: OVERVIEW */}
                 {activeTab === 'overview' && (
                     <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">

@@ -16,6 +16,9 @@ export default function MobileDrawer({
     title
 }: MobileDrawerProps) {
     const [mount, setMount] = useState(false);
+    const [startY, setStartY] = useState(0);
+    const [currentY, setCurrentY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -33,6 +36,29 @@ export default function MobileDrawer({
         };
     }, [isOpen]);
 
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setStartY(e.touches[0].clientY);
+        setIsDragging(true);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!isDragging) return;
+        const diff = e.touches[0].clientY - startY;
+        if (diff > 0) {
+            setCurrentY(diff); // Only allow dragging down
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+        if (currentY > 150) {
+            // If dragged down more than 150px, close
+            onClose();
+        }
+        // Reset position
+        setCurrentY(0);
+    };
+
     if (!mount) return null;
 
     return createPortal(
@@ -44,12 +70,15 @@ export default function MobileDrawer({
                 className={`
                     w-full max-h-[92vh] bg-slate-900/95 border-t border-white/10 rounded-t-2xl shadow-2xl flex flex-col 
                     transform transition-transform duration-300 ease-out
-                    ${isOpen ? "translate-y-0" : "translate-y-full"}
                 `}
                 onClick={(e) => e.stopPropagation()}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{ transform: isOpen ? `translateY(${Math.max(0, currentY)}px)` : 'translateY(100%)' }}
             >
                 {/* Drag Handle Area */}
-                <div className="w-full flex justify-center pt-3 pb-2 shrink-0" onClick={onClose}>
+                <div className="w-full flex justify-center pt-3 pb-2 shrink-0 cursor-grab active:cursor-grabbing" onClick={onClose}>
                     <div className="w-12 h-1.5 bg-slate-700/50 rounded-full" />
                 </div>
 
