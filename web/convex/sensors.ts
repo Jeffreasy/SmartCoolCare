@@ -299,55 +299,7 @@ export const getHumidityHistory = query({
     },
 });
 
-// ========================================================================
-// 5. CLAIM DEVICE
-// ========================================================================
-export const claimDevice = mutation({
-    args: {
-        sensorId: v.string(),
-        macVerify: v.string(),
-    },
-    handler: async (ctx, args) => {
-        const userId = await getCurrentUserId(ctx);
 
-        if (!userId) {
-            throw new Error("Not authenticated");
-        }
-
-        const device = await ctx.db
-            .query("devices")
-            .withIndex("by_deviceId", (q) => q.eq("deviceId", args.sensorId))
-            .unique();
-
-        if (!device) {
-            throw new Error("Device not found. Make sure it's powered on and has sent data.");
-        }
-
-        if (device.userId) {
-            throw new Error("Device is already claimed by another user.");
-        }
-
-        if (!device.hardwareMac) {
-            throw new Error("Device has not reported MAC address yet. Wait a few seconds and try again.");
-        }
-
-        // MAC verification
-        const dbMac = device.hardwareMac.toLowerCase().replace(/[^a-z0-9]/g, "");
-        const inputMac = args.macVerify.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-        if (!dbMac.includes(inputMac) || inputMac.length < 6) {
-            throw new Error("MAC address verification failed. Check the label on your device.");
-        }
-
-        // Claim device
-        await ctx.db.patch(device._id, {
-            userId: userId,
-            claimedAt: Date.now(),
-        });
-
-        return { success: true, sensorId: device.deviceId };
-    },
-});
 
 // ========================================================================
 // 6. UNCLAIM DEVICE (GDPR Compliant)

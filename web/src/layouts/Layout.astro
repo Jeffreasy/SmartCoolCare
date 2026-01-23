@@ -10,12 +10,14 @@
  * hydration issues with Astro's MPA model.
  */
 import "../styles/global.css";
+import Navbar from "../components/ui/Navbar";
 
 interface Props {
     title: string;
+    disableNavbarAuth?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, disableNavbarAuth = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -37,6 +39,7 @@ const { title } = Astro.props;
         />
     </head>
     <body class="min-h-screen bg-bg text-text font-sans">
+        <Navbar client:load enableAuth={!disableNavbarAuth} />
         <slot />
     </body>
 </html>

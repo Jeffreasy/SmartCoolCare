@@ -32,6 +32,11 @@ export default defineSchema({
         lastDeviceStatus: v.string(),  // "healthy", "degraded", "offline"
 
         // Configuration (Calibration & Thresholds)
+        minTemp: v.optional(v.number()), // Lower alert threshold
+        maxTemp: v.optional(v.number()), // Upper alert threshold
+        deviceType: v.optional(v.string()), // "fridge", "freezer", "wine", etc.
+        icon: v.optional(v.string()), // Custom icon override
+
         config: v.optional(v.object({
             tempOffsetWired: v.optional(v.number()),
             tempOffsetBle: v.optional(v.number()),
