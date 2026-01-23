@@ -7,7 +7,7 @@ export default function LoginPageIsland() {
         <ConvexAuthProvider>
             <div className="flex justify-center items-center w-full">
                 <SignIn
-                    signUpUrl="/signup"
+                    // No public signup link
                     forceRedirectUrl="/dashboard"
                     appearance={clerkDeepGlassTheme}
                 />

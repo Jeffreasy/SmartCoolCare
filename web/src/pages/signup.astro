@@ -1,31 +1,51 @@
----
-import Layout from "../layouts/Layout.astro";
-import SignupPageIsland from "../components/auth/SignupPageIsland.tsx";
-import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
----
+import Layout from "../layouts/Layout.astro"; import BackgroundOrbs from
+"../components/ui/BackgroundOrbs.astro"; import {Lock} from "lucide-react";
 
-<Layout title="Sign Up - KoelkastProject">
+<Layout title="Invite Only - KoelkastProject">
     <div
         class="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden"
     >
-        <!-- Background Orbs -->
         <BackgroundOrbs />
 
         <div
-            class="w-full max-w-2xl relative z-10 animate-in fade-in zoom-in-95 duration-300"
+            class="w-full max-w-lg relative z-10 animate-in fade-in zoom-in-95 duration-300"
         >
-            <div class="glass-panel p-8 md:p-10 border-border bg-card">
-                <div class="text-center mb-8">
-                    <h1
-                        class="text-3xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent mb-2"
+            <div class="glass-panel p-8 text-center border-border bg-card">
+                <div class="mb-6 flex justify-center">
+                    <div
+                        class="p-4 rounded-full bg-primary/10 border border-primary/20"
                     >
-                        Create Account
-                    </h1>
-                    <p class="text-muted-foreground">
-                        Join the SmartCool revolution
-                    </p>
+                        <Lock className="w-8 h-8 text-primary" />
+                    </div>
                 </div>
-                <SignupPageIsland client:only="react" />
+
+                <h1 class="text-3xl font-bold text-foreground mb-4">
+                    Invite Only
+                </h1>
+
+                <p class="text-muted-foreground mb-8 leading-relaxed">
+                    Account creation for <strong>SmartCool Care</strong> is currently
+                    restricted to invited organizations only.
+                    <br /><br />
+                    If you have an invitation code, please follow the link provided
+                    in your email to redeem access.
+                </p>
+
+                <div class="space-y-4">
+                    <a
+                        href="/login"
+                        class="block w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all"
+                    >
+                        Detailed Login
+                    </a>
+
+                    <a
+                        href="mailto:access@laventecare.com"
+                        class="block w-full py-3 rounded-lg bg-secondary text-muted-foreground font-semibold hover:bg-secondary/80 transition-all border border-border"
+                    >
+                        Request Access
+                    </a>
+                </div>
             </div>
         </div>
     </div>
