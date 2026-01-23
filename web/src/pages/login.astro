@@ -33,7 +33,7 @@ import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
     </style>
 
     <div
-        class="min-h-screen flex items-center justify-center p-4 bg-slate-950 relative overflow-hidden"
+        class="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden"
     >
         <!-- Background Orbs -->
         <BackgroundOrbs />
@@ -44,11 +44,11 @@ import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
             <div class="glass-panel p-6 md:p-8">
                 <div class="text-center mb-6">
                     <h1
-                        class="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2"
+                        class="text-2xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent mb-2"
                     >
                         Welcome Back
                     </h1>
-                    <p class="text-slate-400 text-sm">
+                    <p class="text-muted-foreground text-sm">
                         Log in to your IoT dashboard
                     </p>
                 </div>

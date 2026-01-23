@@ -43,6 +43,23 @@ ChartJS.register(
     zoomPlugin
 );
 
+// Semantic Chart Theme (Must match tailwind.config.mjs)
+const CHART_THEME = {
+    wired: {
+        hex: '#818cf8', // sensor.wired
+        bgStart: 'rgba(129, 140, 248, 0.2)',
+        bgEnd: 'rgba(129, 140, 248, 0.0)'
+    },
+    wireless: {
+        hex: '#34d399', // sensor.wireless
+        bgStart: 'rgba(52, 211, 153, 0.2)',
+        bgEnd: 'rgba(52, 211, 153, 0.0)'
+    },
+    humidity: {
+        hex: '#38bdf8', // sensor.humidity
+    }
+};
+
 interface TemperatureChartProps {
     deviceName: string;
     minTemp?: number;
@@ -225,9 +242,9 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
 
     // Helper for Stability Label
     const getStabilityLabel = (stdDev: number) => {
-        if (stdDev < 0.5) return { label: 'High', color: 'text-emerald-400', bg: 'bg-emerald-500/10' };
-        if (stdDev < 1.5) return { label: 'Medium', color: 'text-yellow-400', bg: 'bg-yellow-500/10' };
-        return { label: 'Low', color: 'text-red-400', bg: 'bg-red-500/10' };
+        if (stdDev < 0.5) return { label: 'High', color: 'text-status-success', bg: 'bg-status-success/10' };
+        if (stdDev < 1.5) return { label: 'Medium', color: 'text-status-warning', bg: 'bg-status-warning/10' };
+        return { label: 'Low', color: 'text-status-error', bg: 'bg-status-error/10' };
     };
 
     // Helper for Time Format
@@ -242,19 +259,19 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
         const isSafe = stats.timeInRange > 90;
 
         return (
-            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group">
+            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 p-4 bg-card rounded-xl border border-border hover:bg-accent/50 transition-colors group">
                 {/* 1. Sensor Name */}
                 <div className="md:col-span-1 flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-slate-900/50 ${color}`}>
+                    <div className={`p-2 rounded-lg bg-background/50 ${color}`}>
                         {icon}
                     </div>
-                    <span className="font-semibold text-slate-200 text-sm hidden md:block">{label}</span>
-                    <span className="font-semibold text-slate-200 text-sm md:hidden">{label} Sensor</span>
+                    <span className="font-semibold text-foreground text-sm hidden md:block">{label}</span>
+                    <span className="font-semibold text-foreground text-sm md:hidden">{label} Sensor</span>
                 </div>
 
                 {/* 2. Current */}
                 <div className="flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-500 md:hidden">Current</span>
+                    <span className="text-[10px] text-muted-foreground md:hidden">Current</span>
                     <div className="flex items-center gap-2">
                         <span className={`text-lg font-mono font-bold ${color}`}>
                             {stats.current.toFixed(1)}{unit}
@@ -269,52 +286,51 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                 {/* 3. Min */}
                 <div className="flex flex-col justify-center">
                     <span className="text-[10px] text-slate-500 md:hidden">Min</span>
-                    <span className="text-sm font-mono font-medium text-white">
+                    <span className="text-sm font-mono font-medium text-foreground">
                         {stats.min.val.toFixed(1)}{unit}
                     </span>
-                    <span className="text-[10px] text-slate-500">{formatTime(stats.min.time)}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatTime(stats.min.time)}</span>
                 </div>
 
                 {/* 4. Max */}
                 <div className="flex flex-col justify-center">
                     <span className="text-[10px] text-slate-500 md:hidden">Max</span>
-                    <span className="text-sm font-mono font-medium text-white">
+                    <span className="text-sm font-mono font-medium text-foreground">
                         {stats.max.val.toFixed(1)}{unit}
                     </span>
-                    <span className="text-[10px] text-slate-500">{formatTime(stats.max.time)}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatTime(stats.max.time)}</span>
                 </div>
 
-                {/* 5. Average */}
                 <div className="flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-500 md:hidden">Avg</span>
-                    <span className="text-sm font-mono font-medium text-slate-300">
+                    <span className="text-[10px] text-muted-foreground md:hidden">Avg</span>
+                    <span className="text-sm font-mono font-medium text-muted-foreground">
                         {stats.avg.toFixed(1)}{unit}
                     </span>
                 </div>
 
                 {/* 6. Stability (Temp only) */}
                 <div className="flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-500 md:hidden">Stability</span>
+                    <span className="text-[10px] text-muted-foreground md:hidden">Stability</span>
                     {stability ? (
                         <div className={`px-2 py-0.5 rounded text-xs font-bold w-fit ${stability.bg} ${stability.color}`}>
                             {stability.label}
                         </div>
                     ) : (
-                        <span className="text-slate-600 text-xs">-</span>
+                        <span className="text-muted-foreground text-xs">-</span>
                     )}
                 </div>
 
                 {/* 7. Time in Range */}
                 <div className="md:col-span-1 flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-500 md:hidden">Time in Range</span>
+                    <span className="text-[10px] text-muted-foreground md:hidden">Time in Range</span>
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full ${isSafe ? 'bg-emerald-500' : 'bg-red-500'}`}
+                                className={`h-full rounded-full ${isSafe ? 'bg-status-success' : 'bg-status-error'}`}
                                 style={{ width: `${stats.timeInRange}%` }}
                             />
                         </div>
-                        <span className={`text-xs font-bold ${isSafe ? 'text-emerald-400' : 'text-red-400'}`}>
+                        <span className={`text-xs font-bold ${isSafe ? 'text-status-success' : 'text-status-error'}`}>
                             {Math.round(stats.timeInRange)}%
                         </span>
                     </div>
@@ -351,12 +367,12 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     {
                         label: 'Wired Temp (°C)',
                         data: wiredTemperatures,
-                        borderColor: '#818cf8',
+                        borderColor: CHART_THEME.wired.hex,
                         backgroundColor: (context: ScriptableContext<'line'>) => {
                             const ctx = context.chart.ctx;
                             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                            gradient.addColorStop(0, 'rgba(129, 140, 248, 0.2)');
-                            gradient.addColorStop(1, 'rgba(129, 140, 248, 0.0)');
+                            gradient.addColorStop(0, CHART_THEME.wired.bgStart);
+                            gradient.addColorStop(1, CHART_THEME.wired.bgEnd);
                             return gradient;
                         },
                         borderWidth: 2,
@@ -370,12 +386,12 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     {
                         label: 'BLE Temp (°C)',
                         data: bleTemperatures,
-                        borderColor: '#34d399',
+                        borderColor: CHART_THEME.wireless.hex,
                         backgroundColor: (context: ScriptableContext<'line'>) => {
                             const ctx = context.chart.ctx;
                             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                            gradient.addColorStop(0, 'rgba(52, 211, 153, 0.2)');
-                            gradient.addColorStop(1, 'rgba(52, 211, 153, 0.0)');
+                            gradient.addColorStop(0, CHART_THEME.wireless.bgStart);
+                            gradient.addColorStop(1, CHART_THEME.wireless.bgEnd);
                             return gradient;
                         },
                         borderWidth: 2,
@@ -389,7 +405,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     {
                         label: 'Humidity (%)',
                         data: chartData.map(d => d.humidity ?? null),
-                        borderColor: '#0ea5e9',
+                        borderColor: CHART_THEME.humidity.hex,
                         backgroundColor: 'transparent',
                         borderWidth: 2,
                         pointRadius: 0,
@@ -475,8 +491,8 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                         display: true,
                         position: 'right',
                         grid: { drawOnChartArea: false },
-                        ticks: { color: '#0ea5e9' },
-                        title: { display: true, text: 'Humidity (%)', color: '#0ea5e9' },
+                        ticks: { color: CHART_THEME.humidity.hex },
+                        title: { display: true, text: 'Humidity (%)', color: CHART_THEME.humidity.hex },
                         min: 0,
                         max: 100,
                     },
@@ -495,7 +511,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
 
     if (!telemetry || (!telemetry.wired?.length && !telemetry.ble?.length)) {
         return (
-            <div className="h-[400px] flex items-center justify-center text-slate-500 glass-card">
+            <div className="h-[400px] flex items-center justify-center text-muted-foreground glass-card">
                 <p>No data available for selected time range</p>
             </div>
         );
@@ -511,8 +527,8 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                             key={range}
                             onClick={() => setTimeRange(range)}
                             className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${timeRange === range
-                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                                : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                                 }`}
                         >
                             {range}
@@ -521,8 +537,8 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     <button
                         onClick={() => setShowCustomPicker(!showCustomPicker)}
                         className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${timeRange === 'CUSTOM'
-                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                            : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                            : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                             }`}
                     >
                         Custom
@@ -533,7 +549,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     {/* View Mode Toggle */}
                     <button
                         onClick={() => setViewMode(viewMode === 'chart' ? 'table' : 'chart')}
-                        className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg text-sm font-semibold transition-all"
+                        className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-muted-foreground rounded-lg text-sm font-semibold transition-all"
                     >
                         {viewMode === 'chart' ? '📊 Chart' : '📋 Table'}
                     </button>
@@ -542,8 +558,8 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     <button
                         onClick={() => setLiveMode(!liveMode)}
                         className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${liveMode
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                            : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                            ? 'bg-status-success text-primary-foreground shadow-lg shadow-status-success/30'
+                            : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                             }`}
                     >
                         {liveMode ? '🔴 Live' : '⏸️ Paused'}
@@ -551,13 +567,13 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
 
                     {/* Export Dropdown */}
                     <div className="relative group">
-                        <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg text-sm font-semibold transition-all">
+                        <button className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-muted-foreground rounded-lg text-sm font-semibold transition-all">
                             Export ⬇️
                         </button>
-                        <div className="absolute right-0 mt-1 w-32 bg-slate-900 border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all z-10">
-                            <button onClick={exportCSV} className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-white/10 rounded-t-lg">CSV</button>
-                            <button onClick={exportJSON} className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-white/10">JSON</button>
-                            <button onClick={exportPNG} className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-white/10 rounded-b-lg">PNG</button>
+                        <div className="absolute right-0 mt-1 w-32 bg-popover border border-border rounded-lg shadow-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all z-10">
+                            <button onClick={exportCSV} className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-accent rounded-t-lg">CSV</button>
+                            <button onClick={exportJSON} className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-accent">JSON</button>
+                            <button onClick={exportPNG} className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-accent rounded-b-lg">PNG</button>
                         </div>
                     </div>
                 </div>
@@ -565,15 +581,15 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
 
             {/* Custom Date Picker (if shown) */}
             {showCustomPicker && (
-                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                    <label className="text-sm text-slate-400 mb-2 block">Start Time</label>
+                <div className="bg-card p-4 rounded-lg border border-border">
+                    <label className="text-sm text-muted-foreground mb-2 block">Start Time</label>
                     <input
                         type="datetime-local"
                         onChange={(e) => {
                             setCustomStartTime(new Date(e.target.value).getTime());
                             setTimeRange('CUSTOM');
                         }}
-                        className="bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-white w-full"
+                        className="bg-input border border-border rounded-lg px-4 py-2 text-foreground w-full"
                     />
                 </div>
             )}
@@ -581,7 +597,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
             {/* Statistics Panel */}
             {statistics && (
                 <div className="space-y-3">
-                    <div className="hidden md:grid grid-cols-7 gap-4 px-4 pb-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <div className="hidden md:grid grid-cols-7 gap-4 px-4 pb-1 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                         <div className="col-span-1">Sensor</div>
                         <div className="text-center md:text-left">Current</div>
                         <div className="text-center md:text-left">Min</div>
@@ -594,19 +610,19 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     <StatsRow
                         label="Wired"
                         icon={<span className="text-lg">🔌</span>}
-                        color="text-indigo-400"
+                        color="text-sensor-wired"
                         stats={statistics.wired}
                     />
                     <StatsRow
                         label="Wireless"
                         icon={<span className="text-lg">📡</span>}
-                        color="text-emerald-400"
+                        color="text-sensor-wireless"
                         stats={statistics.ble}
                     />
                     <StatsRow
                         label="Humidity"
                         icon={<span className="text-lg">💧</span>}
-                        color="text-sky-400"
+                        color="text-sensor-humidity"
                         stats={statistics.humidity}
                         isHumidity={true}
                     />
@@ -620,7 +636,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                     <div className="absolute top-2 right-2 flex gap-2">
                         <button
                             onClick={() => chartRef.current?.resetZoom()}
-                            className="px-3 py-1 bg-slate-900/80 text-slate-300 text-xs rounded-lg hover:bg-slate-800 transition-all"
+                            className="px-3 py-1 bg-popover/80 text-foreground text-xs rounded-lg hover:bg-popover transition-all border border-border"
                         >
                             Reset Zoom
                         </button>
@@ -629,27 +645,27 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-white/5">
+                        <thead className="bg-secondary/50">
                             <tr>
-                                <th className="px-4 py-2 text-left text-slate-400">Time</th>
-                                <th className="px-4 py-2 text-left text-slate-400">Wired (°C)</th>
-                                <th className="px-4 py-2 text-left text-slate-400">BLE (°C)</th>
-                                <th className="px-4 py-2 text-left text-slate-400">Humidity (%)</th>
+                                <th className="px-4 py-2 text-left text-muted-foreground">Time</th>
+                                <th className="px-4 py-2 text-left text-muted-foreground">Wired (°C)</th>
+                                <th className="px-4 py-2 text-left text-muted-foreground">BLE (°C)</th>
+                                <th className="px-4 py-2 text-left text-muted-foreground">Humidity (%)</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-border">
                             {chartData?.slice(0, 50).map((d, i) => (
-                                <tr key={i} className="hover:bg-white/5">
-                                    <td className="px-4 py-2 text-slate-300">
+                                <tr key={i} className="hover:bg-accent/50">
+                                    <td className="px-4 py-2 text-foreground">
                                         {new Date(d.time).toLocaleString('nl-NL')}
                                     </td>
-                                    <td className="px-4 py-2 text-indigo-400 font-mono">
+                                    <td className="px-4 py-2 text-sensor-wired font-mono">
                                         {d.wiredTemp !== null ? d.wiredTemp.toFixed(1) : '--'}
                                     </td>
-                                    <td className="px-4 py-2 text-emerald-400 font-mono">
+                                    <td className="px-4 py-2 text-sensor-wireless font-mono">
                                         {d.bleTemp !== null ? d.bleTemp.toFixed(1) : '--'}
                                     </td>
-                                    <td className="px-4 py-2 text-sky-400 font-mono">
+                                    <td className="px-4 py-2 text-sensor-humidity font-mono">
                                         {d.humidity !== null ? d.humidity.toFixed(1) : '--'}
                                     </td>
                                 </tr>
@@ -657,7 +673,7 @@ export default function TemperatureChart({ deviceName, minTemp, maxTemp }: Tempe
                         </tbody>
                     </table>
                     {chartData && chartData.length > 50 && (
-                        <p className="text-xs text-slate-500 text-center mt-2">
+                        <p className="text-xs text-muted-foreground text-center mt-2">
                             Showing first 50 of {chartData.length} readings
                         </p>
                     )}

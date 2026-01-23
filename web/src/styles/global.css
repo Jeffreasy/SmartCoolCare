@@ -4,25 +4,25 @@
 
 @layer base {
     body {
-        @apply bg-surface text-slate-800 antialiased;
+        @apply bg-background text-foreground antialiased;
     }
 }
 
 @layer components {
     .glass-card {
-        @apply backdrop-blur-xl bg-slate-900/40 border border-white/10 shadow-glass rounded-2xl ring-1 ring-white/5;
+        @apply backdrop-blur-xl bg-card border border-border shadow-glass rounded-2xl ring-1 ring-white/5;
     }
 
     .glass-panel {
-        @apply backdrop-blur-2xl bg-slate-950/60 border border-indigo-500/10 shadow-2xl rounded-3xl ring-1 ring-indigo-500/10;
+        @apply backdrop-blur-2xl bg-card border border-border shadow-2xl rounded-3xl ring-1 ring-border;
     }
 
     .btn-primary {
-        @apply bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 font-semibold;
+        @apply bg-primary hover:bg-primary-hover text-primary-foreground px-6 py-3 rounded-xl shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 font-semibold;
     }
 
     .btn-secondary {
-        @apply bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl border border-white/20 transition-all font-semibold backdrop-blur-md;
+        @apply bg-secondary hover:bg-white/20 text-secondary-foreground px-6 py-3 rounded-xl border border-border transition-all font-semibold backdrop-blur-md;
     }
 }
 

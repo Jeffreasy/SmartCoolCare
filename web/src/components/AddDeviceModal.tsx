@@ -73,11 +73,11 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
             <div className="space-y-6">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
+                    <div className="w-16 h-16 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-primary/30">
                         {step === 3 ? (
-                            <CheckCircle className="w-8 h-8 text-emerald-400" />
+                            <CheckCircle className="w-8 h-8 text-status-success" />
                         ) : (
-                            <Cpu className="w-8 h-8 text-indigo-400" />
+                            <Cpu className="w-8 h-8 text-brand-primary" />
                         )}
                     </div>
                     <h2 className="text-2xl font-bold text-white">
@@ -103,7 +103,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                                 value={deviceId}
                                 onChange={(e) => setDeviceId(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleNext()}
-                                className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
+                                className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-slate-600"
                                 autoFocus
                             />
                         </div>
@@ -118,7 +118,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                                 value={macVerify}
                                 onChange={(e) => setMacVerify(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
+                                className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-slate-600"
                                 autoFocus
                             />
                             <p className="text-xs text-slate-500 mt-2">This ensures you physically possess the device.</p>
@@ -126,7 +126,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                     )}
 
                     {error && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center">
+                        <div className="p-3 bg-status-error/10 border border-status-error/20 rounded-lg text-status-error text-sm text-center">
                             {error}
                         </div>
                     )}
@@ -136,7 +136,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                         {step === 1 && (
                             <>
                                 <button onClick={handleClose} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-all duration-200 font-medium cursor-pointer">Cancel</button>
-                                <button onClick={handleNext} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-indigo-500/20 cursor-pointer">Next</button>
+                                <button onClick={handleNext} className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-brand-primary/20 cursor-pointer">Next</button>
                             </>
                         )}
                         {step === 2 && (
@@ -145,7 +145,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                                 <button
                                     onClick={handleSubmit}
                                     disabled={isLoading}
-                                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                                    className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     {isLoading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                                     Claim Device
@@ -153,7 +153,7 @@ export default function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps)
                             </>
                         )}
                         {step === 3 && (
-                            <button onClick={handleClose} className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-emerald-500/20 cursor-pointer">
+                            <button onClick={handleClose} className="w-full py-3 bg-status-success hover:bg-status-success/90 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-status-success/20 cursor-pointer">
                                 Go to Dashboard
                             </button>
                         )}

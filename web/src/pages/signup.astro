@@ -6,7 +6,7 @@ import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
 
 <Layout title="Sign Up - KoelkastProject">
     <div
-        class="min-h-screen flex items-center justify-center p-4 bg-slate-950 relative overflow-hidden"
+        class="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden"
     >
         <!-- Background Orbs -->
         <BackgroundOrbs />
@@ -14,14 +14,16 @@ import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
         <div
             class="w-full max-w-2xl relative z-10 animate-in fade-in zoom-in-95 duration-300"
         >
-            <div class="glass-panel p-8 md:p-10 border-white/10 bg-white/5">
+            <div class="glass-panel p-8 md:p-10 border-border bg-card">
                 <div class="text-center mb-8">
                     <h1
-                        class="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2"
+                        class="text-3xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent mb-2"
                     >
                         Create Account
                     </h1>
-                    <p class="text-slate-400">Join the SmartCool revolution</p>
+                    <p class="text-muted-foreground">
+                        Join the SmartCool revolution
+                    </p>
                 </div>
                 <SignupPageIsland client:only="react" />
             </div>

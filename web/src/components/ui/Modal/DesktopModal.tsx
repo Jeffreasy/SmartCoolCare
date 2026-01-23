@@ -46,15 +46,15 @@ export default function DesktopModal({
             onClick={onClose}
         >
             <div
-                className={`glass-panel w-full ${maxWidth} p-6 relative animate-in zoom-in-95 duration-200 border border-white/10 shadow-2xl bg-slate-900/95 rounded-2xl flex flex-col max-h-[90vh]`}
+                className={`glass-panel w-full ${maxWidth} p-6 relative animate-in zoom-in-95 duration-200 border border-border/50 shadow-2xl bg-card/95 rounded-2xl flex flex-col max-h-[90vh]`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6 shrink-0">
-                    <div className="text-xl font-bold text-white">{title}</div>
+                    <div className="text-xl font-bold text-foreground">{title}</div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
+                        className="p-2 hover:bg-accent rounded-full transition-colors text-muted-foreground hover:text-foreground"
                         aria-label="Close modal"
                     >
                         <X className="w-5 h-5" />

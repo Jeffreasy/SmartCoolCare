@@ -1,21 +1,102 @@
 ---
-
+import { Heart } from "lucide-react";
 ---
 
 <footer
-    class="py-12 border-t border-white/5 relative z-10 bg-slate-950/50 backdrop-blur-lg"
+    class="relative z-10 border-t border-border bg-background/50 backdrop-blur-xl pt-16 pb-8"
 >
-    <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-slate-500 text-sm">
-            © {new Date().getFullYear()} KoelkastProject. All rights reserved.
-        </p>
-        <p class="text-slate-600 text-xs mt-2">
-            Powered by <a
-                href="#"
-                class="hover:text-slate-400 transition-colors">Convex</a
-            > & <a href="#" class="hover:text-slate-400 transition-colors"
-                >Astro</a
-            >
-        </p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            {/* Brand Column */}
+            <div class="space-y-4">
+                <a
+                    href="/"
+                    class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+                >
+                    SmartCool Care
+                </a>
+                <p
+                    class="text-muted-foreground text-sm leading-relaxed max-w-xs"
+                >
+                    Next-generation IoT monitoring for professional kitchens and
+                    healthcare facilities.
+                </p>
+            </div>
+
+            {/* Navigation Links - Only what exists */}
+            <div>
+                <h3 class="font-semibold text-foreground mb-4">Navigation</h3>
+                <ul class="space-y-3 text-sm">
+                    <li>
+                        <a
+                            href="/"
+                            class="text-muted-foreground hover:text-primary transition-colors"
+                            >Home</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="#features"
+                            class="text-muted-foreground hover:text-primary transition-colors"
+                            >Features</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="#pricing"
+                            class="text-muted-foreground hover:text-primary transition-colors"
+                            >Pricing</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/login"
+                            class="text-muted-foreground hover:text-primary transition-colors"
+                            >Log In</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/dashboard"
+                            class="text-muted-foreground hover:text-primary transition-colors"
+                            >Dashboard</a
+                        >
+                    </li>
+                </ul>
+            </div>
+
+            {/* Credits / Contact */}
+            <div>
+                <h3 class="font-semibold text-foreground mb-4">Project Team</h3>
+                <div class="p-4 rounded-xl bg-card border border-border">
+                    <p class="text-xs text-muted-foreground mb-2">
+                        Lead Engineering
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-foreground"
+                            >Jeffrey Lavente</span
+                        >
+                        <Heart
+                            className="w-4 h-4 text-red-500 fill-red-500/20"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div
+            class="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4"
+        >
+            <p class="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} LaventeCare. All rights reserved.
+            </p>
+
+            <p class="text-sm text-muted-foreground">
+                Powered by <span class="text-foreground font-medium"
+                    >Convex</span
+                > & <span class="text-foreground font-medium">Astro</span>
+            </p>
+        </div>
     </div>
 </footer>

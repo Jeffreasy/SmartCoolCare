@@ -20,6 +20,65 @@ export default {
 				// Semantic aliases for Layout
 				bg: '#020617', // Maps to surface.dark / slate-950
 				text: '#e2e8f0', // Maps to slate-200 for good contrast
+
+				// --- SEMANTIC TOKENS ---
+				brand: {
+					primary: '#6366f1', // Indigo 500
+					secondary: '#a855f7', // Purple 500
+				},
+				sensor: {
+					wired: '#818cf8',   // Indigo 400
+					wireless: '#34d399', // Emerald 400
+					humidity: '#38bdf8', // Sky 400
+				},
+				status: {
+					online: '#10b981',  // Emerald 500
+					success: '#10b981', // Emerald 500
+					warning: '#fbbf24', // Amber 400
+					error: '#f87171',   // Red 400
+					offline: '#f87171', // Red 400
+					info: '#60a5fa',    // Blue 400
+				},
+				glass: {
+					border: 'rgba(255, 255, 255, 0.05)',
+				},
+
+				// Standard Semantic Tokens (Shadcn-like)
+				background: '#020617', // slate-950
+				foreground: '#e2e8f0', // slate-200
+
+				card: {
+					DEFAULT: 'rgba(2, 6, 23, 0.5)', // slate-950/50
+					foreground: '#e2e8f0',
+				},
+				popover: {
+					DEFAULT: '#020617',
+					foreground: '#e2e8f0',
+				},
+				primary: {
+					DEFAULT: '#6366f1', // Indigo 500
+					foreground: '#ffffff',
+					hover: '#4f46e5',
+				},
+				secondary: {
+					DEFAULT: 'rgba(255, 255, 255, 0.1)',
+					foreground: '#ffffff',
+				},
+				muted: {
+					DEFAULT: '#1e293b', // slate-800
+					foreground: '#94a3b8', // slate-400
+				},
+				accent: {
+					DEFAULT: 'rgba(255, 255, 255, 0.1)',
+					foreground: '#f8fafc',
+				},
+				destructive: {
+					DEFAULT: '#ef4444',
+					foreground: '#f8fafc',
+				},
+				border: 'rgba(255, 255, 255, 0.1)',
+				input: 'rgba(255, 255, 255, 0.1)',
+				ring: '#6366f1',
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],

@@ -17,14 +17,14 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
     const NavContent = () => (
         <nav
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isMobileMenuOpen
-                ? "bg-slate-950/95 backdrop-blur-md border-b border-white/10 py-3"
+                ? "bg-background/95 backdrop-blur-md border-b border-border py-3"
                 : "bg-transparent py-5"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <a href="/" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                        <a href="/" className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                             SmartCool Care
                         </a>
                     </div>
@@ -34,13 +34,13 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                         {enableAuth ? (
                             <>
                                 <SignedOut>
-                                    <div className="flex items-center gap-6 text-sm font-medium text-slate-300">
-                                        <a href="/#features" className="hover:text-white transition-colors">Features</a>
-                                        <a href="/#pricing" className="hover:text-white transition-colors">Pricing</a>
+                                    <div className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+                                        <a href="/#features" className="hover:text-foreground transition-colors">Features</a>
+                                        <a href="/#pricing" className="hover:text-foreground transition-colors">Pricing</a>
                                     </div>
                                     <a
                                         href="/login"
-                                        className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/10 backdrop-blur-sm"
+                                        className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 text-foreground text-sm font-medium transition-all border border-border backdrop-blur-sm"
                                     >
                                         Sign In
                                     </a>
@@ -49,7 +49,7 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                                 <SignedIn>
                                     <a
                                         href="/dashboard"
-                                        className="text-sm font-medium text-slate-300 hover:text-white transition-colors mr-4"
+                                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-4"
                                     >
                                         Dashboard
                                     </a>
@@ -58,7 +58,7 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                                             afterSignOutUrl="/"
                                             appearance={{
                                                 elements: {
-                                                    avatarBox: "w-9 h-9 border-2 border-white/20"
+                                                    avatarBox: "w-9 h-9 border-2 border-border"
                                                 }
                                             }}
                                         />
@@ -66,8 +66,8 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                                 </SignedIn>
                             </>
                         ) : (
-                            <div className="flex items-center gap-6 text-sm font-medium text-slate-300">
-                                <a href="/" className="hover:text-white transition-colors">Home</a>
+                            <div className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+                                <a href="/" className="hover:text-foreground transition-colors">Home</a>
                             </div>
                         )}
                     </div>
@@ -81,7 +81,7 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                         )}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-slate-300 hover:text-white p-2"
+                            className="text-muted-foreground hover:text-foreground p-2"
                         >
                             {isMobileMenuOpen ? (
                                 <X className="w-6 h-6" />
@@ -99,18 +99,18 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                             {enableAuth ? (
                                 <>
                                     <SignedOut>
-                                        <a href="/#features" className="text-slate-300 hover:text-white py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
-                                        <a href="/#pricing" className="text-slate-300 hover:text-white py-2" onClick={() => setIsMobileMenuOpen(false)}>Pricing</a>
-                                        <div className="pt-2 border-t border-white/5">
-                                            <a href="/login" className="block w-full py-3 bg-indigo-600 rounded-lg text-white font-medium" onClick={() => setIsMobileMenuOpen(false)}>Sign In</a>
+                                        <a href="/#features" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+                                        <a href="/#pricing" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Pricing</a>
+                                        <div className="pt-2 border-t border-border">
+                                            <a href="/login" className="block w-full py-3 bg-primary rounded-lg text-primary-foreground font-medium" onClick={() => setIsMobileMenuOpen(false)}>Sign In</a>
                                         </div>
                                     </SignedOut>
                                     <SignedIn>
-                                        <a href="/dashboard" className="text-slate-300 hover:text-white py-2 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Go to Dashboard</a>
+                                        <a href="/dashboard" className="text-muted-foreground hover:text-foreground py-2 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Go to Dashboard</a>
                                     </SignedIn>
                                 </>
                             ) : (
-                                <a href="/" className="text-slate-300 hover:text-white py-2" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+                                <a href="/" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
                             )}
                         </div>
                     </div>

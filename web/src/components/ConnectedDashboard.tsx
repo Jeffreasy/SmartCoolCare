@@ -82,7 +82,7 @@ function DashboardContent() {
                 <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
                     <button
                         onClick={() => setIsAddDeviceOpen(true)}
-                        className="flex-1 sm:flex-none justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                        className="flex-1 sm:flex-none justify-center px-4 py-2 bg-brand-primary hover:bg-brand-primary/90 text-white text-sm font-medium rounded-lg shadow-lg shadow-brand-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
                     >
                         <Plus className="w-4 h-4" />
                         <span>Add Device</span>
@@ -98,42 +98,42 @@ function DashboardContent() {
                 <StatCard
                     label="Total Devices"
                     value={stats.total}
-                    color="text-indigo-400"
+                    color="text-brand-primary"
                     icon={<Server className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Active & Online"
                     value={stats.online}
                     subtext={`${stats.total > 0 ? Math.round((stats.online / stats.total) * 100) : 0}% Operational`}
-                    color="text-emerald-400"
+                    color="text-status-success"
                     icon={<Activity className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Attention Needed"
                     value={stats.attention}
                     subtext={stats.attention > 0 ? "Check alerts below" : "All systems normal"}
-                    color={stats.attention > 0 ? "text-red-400" : "text-emerald-400"}
+                    color={stats.attention > 0 ? "text-status-error" : "text-status-success"}
                     icon={<AlertTriangle className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Wired Avg."
                     value={stats.avgWiredTemp ? `${stats.avgWiredTemp.toFixed(1)}°C` : "--"}
                     subtext="DS18B20 Sensors"
-                    color="text-indigo-400"
+                    color="text-sensor-wired"
                     icon={<Thermometer className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Wireless Avg."
                     value={stats.avgBleTemp ? `${stats.avgBleTemp.toFixed(1)}°C` : "--"}
                     subtext="BLE Sensors"
-                    color="text-emerald-400"
+                    color="text-sensor-wireless"
                     icon={<Thermometer className="w-12 h-12" />}
                 />
                 <StatCard
                     label="Avg. Humidity"
                     value={stats.avgHumidity ? `${stats.avgHumidity.toFixed(1)}%` : "--"}
                     subtext="BLE sensors only"
-                    color="text-sky-400"
+                    color="text-sensor-humidity"
                     icon={<span className="text-4xl">💧</span>}
                 />
             </div>

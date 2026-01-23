@@ -92,7 +92,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                             {/* Decorative Glow Line */}
                             <div className={`
                                 absolute top-0 left-0 bottom-0 w-1.5
-                                ${isOnline ? 'bg-gradient-to-b from-emerald-400 to-emerald-600' : 'bg-slate-700'}
+                                ${isOnline ? 'bg-gradient-to-b from-status-online to-emerald-600' : 'bg-slate-700'}
                                 shadow-[0_0_15px_rgba(52,211,153,0.3)]
                             `} />
 
@@ -103,7 +103,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                                         <DeviceTypeIcon type={device.deviceType} />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight group-hover:text-indigo-400 transition-colors">
+                                        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight group-hover:text-brand-primary transition-colors">
                                             {device.displayName || device.deviceId}
                                         </h3>
                                     </div>
@@ -112,8 +112,8 @@ export default function DeviceCard(props: DeviceCardProps) {
                                     px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wider
                                     border backdrop-blur-md
                                     ${isOnline
-                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
-                                        : 'bg-red-500/10 text-red-400 border-red-500/20'}
+                                        ? 'bg-status-online/10 text-status-online border-status-online/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                                        : 'bg-status-offline/10 text-status-offline border-status-offline/20'}
                                 `}>
                                     {isOnline ? 'ONLINE' : 'OFFLINE'}
                                 </span>
@@ -122,23 +122,23 @@ export default function DeviceCard(props: DeviceCardProps) {
                             {/* Main Telemetry Grid */}
                             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 pl-3">
                                 {/* Wired Sensor Box */}
-                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-indigo-500/10 relative overflow-hidden group/wired">
+                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-sensor-wired/10 relative overflow-hidden group/wired">
                                     <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/wired:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_5px_#6366f1]"></div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-sensor-wired shadow-[0_0_5px_currentColor]"></div>
                                     </div>
-                                    <p className="text-[9px] sm:text-[10px] text-indigo-300/60 uppercase font-black tracking-widest mb-1">WIRED</p>
-                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastWiredTemp !== undefined ? 'text-indigo-400' : 'text-slate-700'}`}>
+                                    <p className="text-[9px] sm:text-[10px] text-sensor-wired/60 uppercase font-black tracking-widest mb-1">WIRED</p>
+                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastWiredTemp !== undefined ? 'text-sensor-wired' : 'text-slate-700'}`}>
                                         {device.lastWiredTemp !== undefined ? `${device.lastWiredTemp.toFixed(1)}°C` : '--'}
                                     </p>
                                 </div>
 
                                 {/* Wireless Sensor Box */}
-                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-emerald-500/10 relative overflow-hidden group/ble">
+                                <div className="bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border border-sensor-wireless/10 relative overflow-hidden group/ble">
                                     <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/ble:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]"></div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-sensor-wireless shadow-[0_0_5px_currentColor]"></div>
                                     </div>
-                                    <p className="text-[9px] sm:text-[10px] text-emerald-300/60 uppercase font-black tracking-widest mb-1">WIRELESS</p>
-                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastBleTemp !== undefined ? 'text-emerald-400' : 'text-slate-700'}`}>
+                                    <p className="text-[9px] sm:text-[10px] text-sensor-wireless/60 uppercase font-black tracking-widest mb-1">WIRELESS</p>
+                                    <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${device.lastBleTemp !== undefined ? 'text-sensor-wireless' : 'text-slate-700'}`}>
                                         {device.lastBleTemp !== undefined ? `${device.lastBleTemp.toFixed(1)}°C` : '--'}
                                     </p>
                                 </div>
@@ -149,7 +149,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                                         <span className="text-[9px] sm:text-[10px] text-slate-500 uppercase font-black tracking-widest pl-1">HUMIDITY</span>
                                         <div className="flex items-center gap-2 pr-1">
                                             <span className="text-xl sm:text-2xl filter drop-shadow-[0_0_3px_rgba(56,189,248,0.5)]">💧</span>
-                                            <span className="font-mono font-bold text-lg sm:text-xl text-sky-400 group-hover/hum:text-sky-300 transition-colors">
+                                            <span className="font-mono font-bold text-lg sm:text-xl text-sensor-humidity group-hover/hum:text-sky-300 transition-colors">
                                                 {device.lastBleHumidity.toFixed(1)}%
                                             </span>
                                         </div>
@@ -178,7 +178,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                                         <span className="text-slate-500 text-xs font-medium">Battery (BLE)</span>
                                         <div className="flex items-center gap-2">
                                             <BatteryIcon level={device.lastBleBattery!} />
-                                            <span className={`text-xs font-mono font-bold ${device.lastBleBattery! < 20 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                            <span className={`text-xs font-mono font-bold ${device.lastBleBattery! < 20 ? 'text-status-error' : 'text-status-success'}`}>
                                                 {device.lastBleBattery}%
                                             </span>
                                         </div>

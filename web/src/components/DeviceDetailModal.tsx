@@ -113,11 +113,11 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
 
     const HeaderTitle = (
         <div className="flex flex-col">
-            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
                 <DeviceTypeIcon type={device.deviceType} />
                 {device.displayName || device.deviceId}
             </h2>
-            <p className="text-slate-400 text-xs md:text-sm font-mono mt-0.5">ID: {device.deviceId}</p>
+            <p className="text-muted-foreground text-xs md:text-sm font-mono mt-0.5">ID: {device.deviceId}</p>
         </div>
     );
 
@@ -125,14 +125,14 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
         <ResponsiveModal isOpen={!!device} onClose={onClose} title={HeaderTitle} desktopMaxWidth="max-w-5xl">
             {/* Tab Navigation */}
             <div className="flex w-full mb-6">
-                <div className="flex w-full bg-slate-800/50 p-1 rounded-xl border border-white/5">
+                <div className="flex w-full bg-muted/50 p-1 rounded-xl border border-border">
                     {(['overview', 'history', 'settings'] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${activeTab === tab
-                                ? 'bg-indigo-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-primary text-primary-foreground shadow-lg'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                                 }`}
                         >
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -147,43 +147,44 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                     <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Wired Sensor */}
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-5 relative overflow-hidden group">
+                            <div className="bg-card border border-border rounded-xl p-5 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <Cpu className="w-24 h-24 text-indigo-500" strokeWidth={1} />
+                                    <Cpu className="w-24 h-24 text-sensor-wired" strokeWidth={1} />
                                 </div>
-                                <h3 className="text-indigo-400 text-sm font-bold uppercase mb-1">Wired Sensor</h3>
-                                <div className="text-4xl font-mono font-bold text-white">
+                                <h3 className="text-sensor-wired text-sm font-bold uppercase mb-1">Wired Sensor</h3>
+                                <div className="text-4xl font-mono font-bold text-foreground">
                                     {device.lastWiredTemp !== undefined ? `${device.lastWiredTemp.toFixed(2)}°C` : '--'}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-2">Offset: {device.config?.tempOffsetWired || 0}°C</div>
+                                <div className="text-xs text-muted-foreground mt-2">Offset: {device.config?.tempOffsetWired || 0}°C</div>
                             </div>
                             {/* BLE Sensor */}
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-5 relative overflow-hidden group">
+                            <div className="bg-card border border-border rounded-xl p-5 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <Thermometer className="w-24 h-24 text-emerald-500" strokeWidth={1} />
+                                    <Thermometer className="w-24 h-24 text-sensor-wireless" strokeWidth={1} />
                                 </div>
-                                <h3 className="text-emerald-400 text-sm font-bold uppercase mb-1">Wireless Sensor</h3>
-                                <div className="text-4xl font-mono font-bold text-white">
+                                <h3 className="text-sensor-wireless text-sm font-bold uppercase mb-1">Wireless Sensor</h3>
+                                <div className="text-4xl font-mono font-bold text-foreground">
                                     {device.lastBleTemp !== undefined ? `${device.lastBleTemp.toFixed(2)}°C` : '--'}
                                 </div>
                                 <div className="flex items-center gap-4 text-xs font-medium mt-2">
-                                    {device.lastBleHumidity !== undefined && <span className="text-sky-400">{device.lastBleHumidity.toFixed(1)}% RH</span>}
+                                    {device.lastBleHumidity !== undefined && <span className="text-sensor-humidity">{device.lastBleHumidity.toFixed(1)}% RH</span>}
                                     {device.lastBleBattery !== undefined && <BatteryIcon level={device.lastBleBattery} />}
                                 </div>
                             </div>
                             {/* Status */}
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                                <h3 className="text-slate-400 text-sm font-bold uppercase mb-3">Status</h3>
+                            {/* Status */}
+                            <div className="bg-card border border-border rounded-xl p-5">
+                                <h3 className="text-muted-foreground text-sm font-bold uppercase mb-3">Status</h3>
                                 <div className="space-y-4">
-                                    <div className="flex justify-between"><span className="text-slate-400 text-sm">Condition</span><span className="text-white text-sm capitalize">{device.lastDeviceStatus}</span></div>
-                                    <div className="flex justify-between"><span className="text-slate-400 text-sm">Signal</span><div className="flex gap-2"><span className="text-white text-sm">{device.lastSignalStrength} dBm</span><SignalIcon rssi={device.lastSignalStrength} /></div></div>
-                                    <div className="flex justify-between"><span className="text-slate-400 text-sm">Last Seen</span><span className="text-white text-sm">{timeAgo(device.lastSeenAt)}</span></div>
+                                    <div className="flex justify-between"><span className="text-muted-foreground text-sm">Condition</span><span className="text-foreground text-sm capitalize">{device.lastDeviceStatus}</span></div>
+                                    <div className="flex justify-between"><span className="text-muted-foreground text-sm">Signal</span><div className="flex gap-2"><span className="text-foreground text-sm">{device.lastSignalStrength} dBm</span><SignalIcon rssi={device.lastSignalStrength} /></div></div>
+                                    <div className="flex justify-between"><span className="text-muted-foreground text-sm">Last Seen</span><span className="text-foreground text-sm">{timeAgo(device.lastSeenAt)}</span></div>
                                 </div>
                             </div>
                         </div>
                         {/* Mini Chart Preview */}
-                        <div className="p-4 bg-slate-950/30 rounded-xl border border-white/5">
-                            <h4 className="text-sm font-semibold text-slate-300 mb-4">Quick History (Last 24h)</h4>
+                        <div className="p-4 bg-card rounded-xl border border-border">
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-4">Quick History (Last 24h)</h4>
                             <div className="h-[200px]"><TemperatureChart deviceName={device.deviceId} minTemp={device.minTemp} maxTemp={device.maxTemp} /></div>
                         </div>
                     </div>
@@ -202,27 +203,27 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                 {activeTab === 'settings' && (
                     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-right-4 duration-300 pb-8">
                         <section>
-                            <h3 className="text-lg font-semibold text-white mb-4 border-b border-white/10 pb-2">General Information</h3>
+                            <h3 className="text-lg font-semibold text-foreground mb-4 border-b border-border pb-2">General Information</h3>
                             <div className="grid gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Device Name</label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Device Name</label>
                                     <input
                                         type="text"
                                         value={settingsForm.displayName}
                                         onChange={(e) => setSettingsForm({ ...settingsForm, displayName: e.target.value })}
-                                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Device Type</label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Device Type</label>
                                     <div className="grid grid-cols-3 gap-3">
                                         {['fridge', 'freezer', 'wine'].map((type) => (
                                             <button
                                                 key={type}
                                                 onClick={() => setSettingsForm({ ...settingsForm, deviceType: type })}
                                                 className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all cursor-pointer ${settingsForm.deviceType === type
-                                                    ? 'bg-indigo-600 border-indigo-500 text-white'
-                                                    : 'bg-slate-950 border-white/10 text-slate-400 hover:border-white/30'
+                                                    ? 'bg-primary border-primary text-primary-foreground'
+                                                    : 'bg-input border-border text-muted-foreground hover:border-accent'
                                                     }`}
                                             >
                                                 <DeviceTypeIcon type={type} />
@@ -239,12 +240,12 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                             <p className="text-sm text-slate-500 mb-4">Receive notifications when temperature goes outside this range.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Min Temperature (°C)</label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Min Temperature (°C)</label>
                                     <input
                                         type="number"
                                         value={settingsForm.minTemp}
                                         onChange={(e) => setSettingsForm({ ...settingsForm, minTemp: Number(e.target.value) })}
-                                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition-all"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-sensor-humidity transition-all"
                                     />
                                 </div>
                                 <div>
@@ -253,7 +254,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                         type="number"
                                         value={settingsForm.maxTemp}
                                         onChange={(e) => setSettingsForm({ ...settingsForm, maxTemp: Number(e.target.value) })}
-                                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-all"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-status-error transition-all"
                                     />
                                 </div>
                             </div>
@@ -263,13 +264,13 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                             <h3 className="text-lg font-semibold text-white mb-4 border-b border-white/10 pb-2">Sensor Calibration</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Wired Offset (°C)</label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Wired Offset (°C)</label>
                                     <input
                                         type="number"
                                         step="0.1"
                                         value={settingsForm.tempOffsetWired}
                                         onChange={(e) => setSettingsForm({ ...settingsForm, tempOffsetWired: Number(e.target.value) })}
-                                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-all"
                                     />
                                 </div>
                                 <div>
@@ -279,7 +280,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                         step="0.1"
                                         value={settingsForm.tempOffsetBle}
                                         onChange={(e) => setSettingsForm({ ...settingsForm, tempOffsetBle: Number(e.target.value) })}
-                                        className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-all"
                                     />
                                 </div>
                             </div>
@@ -299,21 +300,21 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                         scanDuration: 10
                                     })}
                                     className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 60
-                                        ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/20'
-                                        : 'border-white/10 bg-white/5 hover:border-amber-500/50 hover:bg-white/10'
+                                        ? 'border-status-warning bg-status-warning/10 shadow-lg shadow-status-warning/20'
+                                        : 'border-border bg-card hover:border-status-warning/50 hover:bg-accent'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3 mb-3">
                                         <span className="text-3xl">⚡</span>
                                         <div>
-                                            <h4 className="font-bold text-white">Quick Test</h4>
-                                            <p className="text-xs text-slate-400">Every 1 minute</p>
+                                            <h4 className="font-bold text-foreground">Quick Test</h4>
+                                            <p className="text-xs text-muted-foreground">Every 1 minute</p>
                                         </div>
                                     </div>
                                     <div className="space-y-1 text-xs">
-                                        <p className="text-slate-400">📊 Very frequent data</p>
-                                        <p className="text-amber-400">🔋 Heavy battery drain</p>
-                                        <p className="text-slate-500">Best for: Testing & debugging</p>
+                                        <p className="text-muted-foreground">📊 Very frequent data</p>
+                                        <p className="text-status-warning">🔋 Heavy battery drain</p>
+                                        <p className="text-muted-foreground">Best for: Testing & debugging</p>
                                     </div>
                                 </button>
 
@@ -325,8 +326,8 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                         scanDuration: 10
                                     })}
                                     className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 180
-                                        ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/20'
-                                        : 'border-white/10 bg-white/5 hover:border-indigo-500/50 hover:bg-white/10'
+                                        ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
+                                        : 'border-border bg-card hover:border-primary/50 hover:bg-accent'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3 mb-3">
@@ -338,7 +339,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                     </div>
                                     <div className="space-y-1 text-xs">
                                         <p className="text-slate-400">📊 Balanced data</p>
-                                        <p className="text-green-400">🔋 Moderate usage</p>
+                                        <p className="text-status-success">🔋 Moderate usage</p>
                                         <p className="text-slate-500">Best for: Daily monitoring</p>
                                     </div>
                                 </button>
@@ -351,8 +352,8 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                         scanDuration: 10
                                     })}
                                     className={`p-5 rounded-xl border-2 transition-all text-left cursor-pointer ${settingsForm.sleepDuration === 300
-                                        ? 'border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/20'
-                                        : 'border-white/10 bg-white/5 hover:border-emerald-500/50 hover:bg-white/10'
+                                        ? 'border-status-success bg-status-success/10 shadow-lg shadow-status-success/20'
+                                        : 'border-border bg-card hover:border-status-success/50 hover:bg-accent'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3 mb-3">
@@ -364,7 +365,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                     </div>
                                     <div className="space-y-1 text-xs">
                                         <p className="text-slate-400">📊 Sufficient data</p>
-                                        <p className="text-emerald-400">🔋 Optimal battery life</p>
+                                        <p className="text-status-success">🔋 Optimal battery life</p>
                                         <p className="text-slate-500">Best for: Long-term use</p>
                                     </div>
                                 </button>
@@ -410,12 +411,12 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
 
                             {/* Advanced: Custom Settings */}
                             <details className="mt-4">
-                                <summary className="text-sm text-slate-400 cursor-pointer hover:text-white transition-colors">
+                                <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                                     Advanced: Custom Settings
                                 </summary>
-                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-950/30 rounded-lg border border-white/5">
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-2">
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2">
                                             Sleep Duration (seconds)
                                         </label>
                                         <input
@@ -428,11 +429,11 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                                 ...settingsForm,
                                                 sleepDuration: Number(e.target.value)
                                             })}
-                                            className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground text-sm focus:outline-none focus:border-primary"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-2">
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2">
                                             Scan Duration (seconds)
                                         </label>
                                         <input
@@ -444,7 +445,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                                                 ...settingsForm,
                                                 scanDuration: Number(e.target.value)
                                             })}
-                                            className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground text-sm focus:outline-none focus:border-primary"
                                         />
                                     </div>
                                 </div>
@@ -454,7 +455,7 @@ export default function DeviceDetailModal({ device: rawDevice, onClose }: Device
                         <div className="flex justify-end pt-4">
                             <button
                                 onClick={handleSaveSettings}
-                                className="w-full md:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                                className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                             >
                                 Save Changes
                             </button>

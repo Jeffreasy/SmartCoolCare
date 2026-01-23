@@ -20,11 +20,11 @@ export function DeviceTypeIcon({ type, className = "w-5 h-5" }: DeviceTypeIconPr
 
 export function SignalIcon({ rssi }: { rssi: number }) {
     let bars = 0;
-    let color = "text-red-500";
-    if (rssi > -50) { bars = 4; color = "text-emerald-400"; }
-    else if (rssi > -60) { bars = 3; color = "text-emerald-400"; }
-    else if (rssi > -70) { bars = 2; color = "text-yellow-400"; }
-    else if (rssi > -80) { bars = 1; color = "text-orange-400"; }
+    let color = "text-status-error";
+    if (rssi > -50) { bars = 4; color = "text-status-success"; }
+    else if (rssi > -60) { bars = 3; color = "text-status-success"; }
+    else if (rssi > -70) { bars = 2; color = "text-status-warning"; }
+    else if (rssi > -80) { bars = 1; color = "text-status-warning"; }
 
     return (
         <div className="flex items-end gap-[2px]" title={`Signal: ${rssi} dBm`}>
@@ -40,9 +40,9 @@ export function SignalIcon({ rssi }: { rssi: number }) {
 }
 
 export function BatteryIcon({ level }: { level: number }) {
-    let color = "text-emerald-400";
-    if (level < 20) color = "text-red-500";
-    else if (level < 50) color = "text-yellow-400";
+    let color = "text-status-success";
+    if (level < 20) color = "text-status-error";
+    else if (level < 50) color = "text-status-warning";
 
     return (
         <div className="flex items-center gap-1" title={`Battery: ${level}%`}>

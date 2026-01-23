@@ -20,18 +20,22 @@ import { AlertTriangle, X, CheckCircle, Check } from "lucide-react";
             <!-- Old Way (Problem) -->
             <Tilt3D>
                 <div
-                    class="glass-panel p-6 md:p-8 border-red-500/10 relative overflow-hidden group hover:bg-red-500/5 transition-colors duration-500 h-full"
+                    class="glass-panel p-6 md:p-8 border-status-error/10 relative overflow-hidden group hover:bg-status-error/5 transition-colors duration-500 h-full"
                 >
                     <div
                         class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:translate-z-20 duration-500"
                     >
-                        <AlertTriangle className="w-24 h-24 text-red-500" />
+                        <AlertTriangle
+                            className="w-24 h-24 text-status-error"
+                        />
                     </div>
 
                     <div
                         class="flex items-center gap-3 mb-6 transform transition-transform duration-500 group-hover:translate-z-10"
                     >
-                        <div class="p-2 bg-red-500/10 rounded-lg text-red-400">
+                        <div
+                            class="p-2 bg-status-error/10 rounded-lg text-status-offline"
+                        >
                             <X className="w-6 h-6" />
                         </div>
                         <h3 class="text-2xl font-bold text-slate-200">
@@ -43,14 +47,14 @@ import { AlertTriangle, X, CheckCircle, Check } from "lucide-react";
                         class="space-y-4 text-slate-400 transform transition-transform duration-500 group-hover:translate-z-10"
                     >
                         <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-1">✕</span>
+                            <span class="text-status-error mt-1">✕</span>
                             <span
                                 ><strong>Manual & Risk Prone:</strong> Time-consuming
                                 paper logs that are often incomplete or falsified.</span
                             >
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-1">✕</span>
+                            <span class="text-status-error mt-1">✕</span>
                             <span
                                 ><strong>Compliance Blindspots:</strong> No visibility
                                 during nights or weekends, risking fines (€1.5k -
@@ -58,7 +62,7 @@ import { AlertTriangle, X, CheckCircle, Check } from "lucide-react";
                             >
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-1">✕</span>
+                            <span class="text-status-error mt-1">✕</span>
                             <span
                                 ><strong>High Hidden Costs:</strong> Over 1 hour/week
                                 per location spent on manual checks.</span
@@ -71,19 +75,19 @@ import { AlertTriangle, X, CheckCircle, Check } from "lucide-react";
             <!-- New Way (Solution) -->
             <Tilt3D>
                 <div
-                    class="glass-panel p-6 md:p-8 border-indigo-500/20 bg-indigo-500/5 relative overflow-hidden group hover:bg-indigo-500/10 transition-colors duration-500 h-full"
+                    class="glass-panel p-6 md:p-8 border-brand-primary/20 bg-brand-primary/5 relative overflow-hidden group hover:bg-brand-primary/10 transition-colors duration-500 h-full"
                 >
                     <div
                         class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:translate-z-20 duration-500"
                     >
-                        <CheckCircle className="w-24 h-24 text-indigo-500" />
+                        <CheckCircle className="w-24 h-24 text-brand-primary" />
                     </div>
 
                     <div
                         class="flex items-center gap-3 mb-6 transform transition-transform duration-500 group-hover:translate-z-10"
                     >
                         <div
-                            class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400"
+                            class="p-2 bg-brand-primary/20 rounded-lg text-brand-primary"
                         >
                             <Check className="w-6 h-6" />
                         </div>
@@ -96,21 +100,21 @@ import { AlertTriangle, X, CheckCircle, Check } from "lucide-react";
                         class="space-y-4 text-slate-300 transform transition-transform duration-500 group-hover:translate-z-10"
                     >
                         <li class="flex items-start gap-3">
-                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span class="text-brand-primary mt-1">✓</span>
                             <span
                                 ><strong>24/7 Automation:</strong> Continuous measurement
                                 every 15 minutes, ensuring 100% audit readiness.</span
                             >
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span class="text-brand-primary mt-1">✓</span>
                             <span
                                 ><strong>Instant Alerts:</strong> Get notified immediately
                                 when usage anomalies or excursions occur.</span
                             >
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigo-400 mt-1">✓</span>
+                            <span class="text-brand-primary mt-1">✓</span>
                             <span
                                 ><strong>Compliance Guarantee:</strong> Fully HACCP
                                 & GDP compliant reporting reachable from anywhere.</span

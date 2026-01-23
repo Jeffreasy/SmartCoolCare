@@ -68,7 +68,7 @@ export default function MobileDrawer({
         >
             <div
                 className={`
-                    w-full max-h-[92vh] bg-slate-900/95 border-t border-white/10 rounded-t-2xl shadow-2xl flex flex-col 
+                    w-full max-h-[92vh] bg-card/95 border-t border-border/50 rounded-t-2xl shadow-2xl flex flex-col 
                     transform transition-transform duration-300 ease-out
                 `}
                 onClick={(e) => e.stopPropagation()}
@@ -79,16 +79,16 @@ export default function MobileDrawer({
             >
                 {/* Drag Handle Area */}
                 <div className="w-full flex justify-center pt-3 pb-2 shrink-0 cursor-grab active:cursor-grabbing" onClick={onClose}>
-                    <div className="w-12 h-1.5 bg-slate-700/50 rounded-full" />
+                    <div className="w-12 h-1.5 bg-muted rounded-full" />
                 </div>
 
                 {/* Header */}
                 {(title) && (
-                    <div className="px-5 pb-4 shrink-0 flex justify-between items-center border-b border-white/5">
-                        <div className="text-lg font-bold text-white">{title}</div>
+                    <div className="px-5 pb-4 shrink-0 flex justify-between items-center border-b border-border/10">
+                        <div className="text-lg font-bold text-foreground">{title}</div>
                         <button
                             onClick={onClose}
-                            className="p-2 -mr-2 text-slate-400 hover:text-white"
+                            className="p-2 -mr-2 text-muted-foreground hover:text-foreground"
                         >
                             <X className="w-6 h-6" />
                         </button>

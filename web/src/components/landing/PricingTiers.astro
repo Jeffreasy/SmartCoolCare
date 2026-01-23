@@ -6,9 +6,10 @@ const plans = [
         name: "Basis",
         price: "€149",
         description: "Essential compliance & automation for kitchens.",
-        color: "text-emerald-400",
-        borderColor: "border-emerald-500/20",
-        btnClass: "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300",
+        color: "text-status-success",
+        borderColor: "border-status-success/20",
+        btnClass:
+            "bg-status-success/10 hover:bg-status-success/20 text-status-success",
         features: [
             "24/7 Temperature Logging",
             "15-min Interval",
@@ -22,10 +23,10 @@ const plans = [
         price: "€199",
         popular: true,
         description: "Advanced prevention & alerts for medication storage.",
-        color: "text-amber-400",
-        borderColor: "border-amber-500/30",
+        color: "text-status-warning",
+        borderColor: "border-status-warning/30",
         btnClass:
-            "btn-primary bg-amber-500 hover:bg-amber-600 border-none text-slate-900 shadow-amber-500/20",
+            "btn-primary bg-status-warning hover:bg-status-warning/90 border-none text-slate-900 shadow-status-warning/20",
         features: [
             "All Basis Features",
             "Door Open Detection (>60s)",
@@ -38,9 +39,10 @@ const plans = [
         name: "Elite",
         price: "€249",
         description: "Fail-safe protection for high-value assets (Vaccines).",
-        color: "text-red-400",
-        borderColor: "border-red-500/20",
-        btnClass: "bg-red-500/10 hover:bg-red-500/20 text-red-300",
+        color: "text-status-error",
+        borderColor: "border-status-error/20",
+        btnClass:
+            "bg-status-error/10 hover:bg-status-error/20 text-status-error",
         features: [
             "All Pro Features",
             "Power-loss Detection",
@@ -70,10 +72,10 @@ const plans = [
                 plans.map((plan) => (
                     <Tilt3D>
                         <div
-                            class={`glass-panel p-6 md:p-8 relative transition-all duration-300 h-full flex flex-col ${plan.popular ? "border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-900/20" : "border-white/10"}`}
+                            class={`glass-panel p-6 md:p-8 relative transition-all duration-300 h-full flex flex-col ${plan.popular ? "border-status-warning/30 bg-status-warning/5 shadow-lg shadow-status-warning/10" : "border-white/10"}`}
                         >
                             {plan.popular && (
-                                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-lg transform transition-transform duration-500 group-hover:translate-z-20">
+                                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-status-warning text-black font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-lg transform transition-transform duration-500 group-hover:translate-z-20">
                                     Recommended
                                 </div>
                             )}
@@ -118,7 +120,7 @@ const plans = [
         <div class="text-center mt-12 text-slate-500 text-sm">
             Need a custom enterprise setup? <a
                 href="#"
-                class="text-indigo-400 underline decoration-indigo-500/30 underline-offset-4"
+                class="text-brand-primary underline decoration-brand-primary/30 underline-offset-4"
                 >Contact Sales</a
             >
         </div>
