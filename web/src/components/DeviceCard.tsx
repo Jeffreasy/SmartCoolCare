@@ -74,7 +74,12 @@ export default function DeviceCard(props: DeviceCardProps) {
     const devices = useQuery(api.sensors.getLiveSensors);
     const updateSettings = useMutation(api.devices.updateSettings);
 
-    const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
+    // Store ID instead of object to keep data fresh
+    const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+
+    // Derive the live device object from the query results
+    const selectedDevice = devices?.find(d => d._id === selectedDeviceId) || null;
+
     const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'settings'>('overview');
 
     // Settings Form State
@@ -87,6 +92,7 @@ export default function DeviceCard(props: DeviceCardProps) {
         tempOffsetBle: 0,
     });
 
+    // Update settings form when device works
     useEffect(() => {
         if (selectedDevice) {
             setSettingsForm({
@@ -98,7 +104,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                 tempOffsetBle: selectedDevice.config?.tempOffsetBle ?? 0,
             });
         }
-    }, [selectedDevice]);
+    }, [selectedDevice?._id]); // Only update when the device ID changes effectively
 
     const handleSaveSettings = async () => {
         if (!selectedDevice) return;
@@ -123,7 +129,7 @@ export default function DeviceCard(props: DeviceCardProps) {
     if (!devices) {
         return (
             <div className="glass-card p-8 flex flex-col items-center justify-center min-h-[200px]">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p className="text-slate-500 font-medium">Laden van devices...</p>
             </div>
         );
@@ -133,16 +139,15 @@ export default function DeviceCard(props: DeviceCardProps) {
         return (
             <div className="glass-card p-8 text-center max-w-md mx-auto mt-8">
                 <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-8 h-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-200 mb-2">No Devices Linked</h3>
                 <p className="text-slate-500 mb-6">Je hebt nog geen apparaten aan je account toegevoegd.</p>
-                {/* Use callback if available, otherwise fallback (though primarily we want the modal) */}
                 <button
                     onClick={props.onAddDevice}
-                    className="btn-primary w-full text-center block pt-3 pb-3 rounded-lg"
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all"
                 >
                     + Nieuw Apparaat Koppelen
                 </button>
@@ -151,67 +156,69 @@ export default function DeviceCard(props: DeviceCardProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {devices.map((device) => {
-                const isOnline = device.lastDeviceStatus !== "offline";
-                const showBattery = device.lastBleBattery !== undefined;
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {devices.map((device) => {
+                    const isOnline = device.lastDeviceStatus !== "offline";
+                    const showBattery = device.lastBleBattery !== undefined;
 
-                return (
-                    <div
-                        key={device._id}
-                        onClick={() => {
-                            setSelectedDevice(device);
-                            setActiveTab('overview');
-                        }}
-                        className={`
+                    return (
+                        <div
+                            key={device._id}
+                            onClick={() => {
+                                setSelectedDeviceId(device._id);
+                                setActiveTab('overview');
+                            }}
+                            className={`
                             glass-card p-6 cursor-pointer transition-all duration-300 hover:shadow-glow
-                            border-l-4 ${isOnline ? 'border-l-success' : 'border-l-danger'}
+                            border-l-4 ${isOnline ? 'border-l-emerald-500' : 'border-l-red-500'}
                             group relative overflow-hidden
                         `}
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-lg font-bold text-slate-100 group-hover:text-primary transition-colors truncate pr-4 flex items-center gap-2">
-                                <DeviceTypeIcon type={device.deviceType} />
-                                {device.displayName || device.deviceId}
-                            </h3>
-                            <span className={`
+                        >
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-lg font-bold text-slate-100 group-hover:text-indigo-400 transition-colors truncate pr-4 flex items-center gap-2">
+                                    <DeviceTypeIcon type={device.deviceType} />
+                                    {device.displayName || device.deviceId}
+                                </h3>
+                                <span className={`
                                 px-3 py-1 rounded-full text-xs font-semibold
                                 ${isOnline
-                                    ? 'bg-success/10 text-success border border-success/20'
-                                    : 'bg-danger/10 text-danger border border-danger/20'}
+                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                        : 'bg-red-500/10 text-red-400 border border-red-500/20'}
                             `}>
-                                {isOnline ? 'ONLINE' : 'OFFLINE'}
-                            </span>
-                        </div>
-                        {/* Summary Metrics (Same as before) */}
-                        <div className="space-y-3">
-                            <div className="flex justify-between text-sm items-center">
-                                <span className="text-slate-400">Last Seen:</span>
-                                <span className="text-slate-300 font-medium">
-                                    {timeAgo(device.lastSeenAt)}
+                                    {isOnline ? 'ONLINE' : 'OFFLINE'}
                                 </span>
                             </div>
-                            <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="text-slate-500">Signal</span>
-                                    <SignalIcon rssi={device.lastSignalStrength} />
+                            {/* Summary Metrics */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-sm items-center">
+                                    <span className="text-slate-400">Last Seen:</span>
+                                    <span className="text-slate-300 font-medium">
+                                        {timeAgo(device.lastSeenAt)}
+                                    </span>
                                 </div>
-                                {showBattery && (
+                                <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
                                     <div className="flex justify-between items-center text-xs">
-                                        <span className="text-slate-500">Battery (BLE)</span>
-                                        <BatteryIcon level={device.lastBleBattery!} />
+                                        <span className="text-slate-500">Signal</span>
+                                        <SignalIcon rssi={device.lastSignalStrength} />
                                     </div>
-                                )}
+                                    {showBattery && (
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-slate-500">Battery (BLE)</span>
+                                            <BatteryIcon level={device.lastBleBattery!} />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
 
             {selectedDevice && (
                 <div
                     className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-md md:p-4 animate-in fade-in duration-200"
-                    onClick={() => setSelectedDevice(null)}
+                    onClick={() => setSelectedDeviceId(null)}
                 >
                     <div
                         className="glass-panel w-full h-[90vh] md:h-[85vh] md:max-w-5xl p-0 relative animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-200 border-t md:border border-white/10 shadow-2xl bg-slate-900/95 rounded-t-2xl md:rounded-2xl flex flex-col overflow-hidden"
@@ -227,7 +234,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                                     </h2>
                                     <p className="text-slate-400 text-xs md:text-sm font-mono mt-1">ID: {selectedDevice.deviceId}</p>
                                 </div>
-                                <button onClick={() => setSelectedDevice(null)} className="md:hidden p-2 -mr-2 text-slate-400 hover:text-white">
+                                <button onClick={() => setSelectedDeviceId(null)} className="md:hidden p-2 -mr-2 text-slate-400 hover:text-white">
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
                             </div>
@@ -246,7 +253,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                                         </button>
                                     ))}
                                 </div>
-                                <button onClick={() => setSelectedDevice(null)} className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white ml-2">
+                                <button onClick={() => setSelectedDeviceId(null)} className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white ml-2">
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
                             </div>
@@ -414,7 +421,8 @@ export default function DeviceCard(props: DeviceCardProps) {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
+
 
