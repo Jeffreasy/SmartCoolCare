@@ -9,6 +9,6 @@ if (!deviceId) {
 }
 ---
 
-<Layout title="Device Details">
-    <DeviceDetailPageIsland client:load deviceId={deviceId} />
+<Layout title="Device Details" hideNavbar={true}>
+    <DeviceDetailPageIsland client:only="react" deviceId={deviceId} />
 </Layout>

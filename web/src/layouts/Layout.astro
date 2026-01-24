@@ -15,9 +15,10 @@ import Navbar from "../components/ui/Navbar";
 interface Props {
     title: string;
     disableNavbarAuth?: boolean;
+    hideNavbar?: boolean;
 }
 
-const { title, disableNavbarAuth = false } = Astro.props;
+const { title, disableNavbarAuth = false, hideNavbar = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -39,7 +40,7 @@ const { title, disableNavbarAuth = false } = Astro.props;
         />
     </head>
     <body class="min-h-screen bg-bg text-text font-sans">
-        <Navbar client:load enableAuth={!disableNavbarAuth} />
+        {!hideNavbar && <Navbar client:load enableAuth={!disableNavbarAuth} />}
         <slot />
     </body>
 </html>

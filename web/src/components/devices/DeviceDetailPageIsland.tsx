@@ -1,9 +1,10 @@
 import { useQuery, useConvexAuth } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import ConvexAuthProvider from "../ConvexAuthProvider";
-import DeviceDetailView, { type Device } from "./DeviceDetailView";
+import DeviceDetailView from "./DeviceDetailView";
 import { ArrowLeft } from "lucide-react";
 import type { Id } from "../../../convex/_generated/dataModel";
+import type { BaseDeviceData } from "@/domain/device-types";
 
 // Wrapper to provide Context providers
 export default function DeviceDetailPageIsland({ deviceId }: { deviceId: string }) {
@@ -49,7 +50,7 @@ function DeviceDetailPageContent({ deviceId }: { deviceId: string }) {
         );
     }
 
-    const device = devices.find(d => d._id === deviceId) as Device | undefined;
+    const device = devices.find(d => d._id === deviceId) as BaseDeviceData | undefined;
 
     if (!device) {
         return (

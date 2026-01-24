@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -15,6 +15,7 @@ import {
     type ScriptableContext,
 } from 'chart.js';
 import { Activity, Radio, Wifi } from "lucide-react";
+import { DeviceTypeIcon, SignalIcon, BatteryIcon } from "../ui/icons";
 
 // Register Chart.js components
 ChartJS.register(
@@ -43,11 +44,45 @@ const CHART_THEME = {
     }
 };
 
+// --- Simulated Components (Mirrors DeviceCard.tsx) ---
+
+const SensorMetric = ({ label, value, unit = "°C", colorClass, borderColorClass, bgClass }: any) => (
+    <div className={`bg-slate-950/60 rounded-xl p-2.5 sm:p-3 border ${borderColorClass} relative overflow-hidden group/metric`}>
+        <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/metric:opacity-100 transition-opacity">
+            <div className={`w-1.5 h-1.5 rounded-full ${bgClass} shadow-[0_0_5px_currentColor]`}></div>
+        </div>
+        <p className={`text-[9px] sm:text-[10px] ${colorClass} opacity-60 uppercase font-black tracking-widest mb-1`}>
+            {label}
+        </p>
+        <p className={`text-xl sm:text-2xl font-mono font-bold tracking-tighter ${value !== undefined ? colorClass : 'text-slate-700'}`}>
+            {value.toFixed(1)}{unit}
+        </p>
+    </div>
+);
+
+const HumidityBanner = ({ value }: { value: number }) => (
+    <div className="col-span-2 bg-gradient-to-r from-slate-950/80 to-slate-900/80 rounded-xl p-2.5 sm:p-3 border border-white/5 flex justify-between items-center group/hum">
+        <span className="text-[9px] sm:text-[10px] text-slate-500 uppercase font-black tracking-widest pl-1">HUMIDITY</span>
+        <div className="flex items-center gap-2 pr-1">
+            <span className="text-xl sm:text-2xl filter drop-shadow-[0_0_3px_rgba(56,189,248,0.5)]">💧</span>
+            <span className="font-mono font-bold text-lg sm:text-xl text-sensor-humidity group-hover/hum:text-sky-300 transition-colors">
+                {value.toFixed(1)}%
+            </span>
+        </div>
+    </div>
+);
+
 export default function LiveDashboardPreview() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const chartRef = useRef<ChartJS | null>(null);
+
+    // Simulation State
     const [lastUpdate, setLastUpdate] = useState(Date.now());
     const [currentTemp, setCurrentTemp] = useState(4.2);
+    const [wiredTemp, setWiredTemp] = useState(3.8);
+    const [humidity, setHumidity] = useState(48.5);
+    const [battery, setBattery] = useState(88);
+    const [rssi, setRssi] = useState(-58);
 
     // Generate initial history
     const generateHistory = () => {
@@ -55,28 +90,39 @@ export default function LiveDashboardPreview() {
         const data = [];
         for (let i = 20; i >= 0; i--) {
             data.push({
-                time: now - i * 3000, // Every 3 seconds
-                val: 3.8 + Math.random() * 0.6 // Random between 3.8 and 4.4
+                time: now - i * 3000,
+                val: 3.8 + Math.random() * 0.6
             });
         }
         return data;
     };
 
-    // Mutable data ref to avoid re-creating chart
     const dataRef = useRef(generateHistory());
 
     // Live Data Simulation
     useEffect(() => {
         const interval = setInterval(() => {
             const now = Date.now();
-            const newVal = 3.9 + Math.random() * 0.4; // Stable fridge temp
+            // Simulate slight fluctuations
+            const newTemp = 3.9 + Math.random() * 0.4;
+            const newWired = 3.7 + Math.random() * 0.3;
+            const newHum = 48 + Math.random() * 1.5;
+
+            // Randomly drop signal slightly
+            const newRssi = -55 - Math.floor(Math.random() * 10);
 
             // Add new point
-            dataRef.current.push({ time: now, val: newVal });
-            // Remove old point
+            dataRef.current.push({ time: now, val: newTemp });
             if (dataRef.current.length > 20) dataRef.current.shift();
 
-            setCurrentTemp(newVal);
+            setCurrentTemp(newTemp);
+            setWiredTemp(newWired);
+            setHumidity(newHum);
+            setRssi(newRssi);
+
+            // Artificial drift for battery (very slow)
+            if (Math.random() > 0.95) setBattery(b => Math.max(10, b - 1));
+
             setLastUpdate(now);
 
             // Update Chart
@@ -85,9 +131,9 @@ export default function LiveDashboardPreview() {
                     new Date(d.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 );
                 chartRef.current.data.datasets[0].data = dataRef.current.map(d => d.val);
-                chartRef.current.update('none'); // Efficient update
+                chartRef.current.update('none');
             }
-        }, 2000); // 2 second updates
+        }, 2000);
 
         return () => clearInterval(interval);
     }, []);
@@ -125,14 +171,8 @@ export default function LiveDashboardPreview() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: {
-                    duration: 1000,
-                    easing: 'linear'
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
+                animation: { duration: 1000, easing: 'linear' },
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -145,23 +185,14 @@ export default function LiveDashboardPreview() {
                         borderWidth: 1,
                         padding: 10,
                         callbacks: {
-                            label: (ctx) => {
-                                if (ctx.parsed.y !== null) {
-                                    return ` ${ctx.parsed.y.toFixed(2)} °C`;
-                                }
-                                return '';
-                            }
+                            label: (ctx) => ctx.parsed.y !== null ? ` ${ctx.parsed.y.toFixed(2)} °C` : ''
                         }
                     }
                 },
                 scales: {
-                    x: {
-                        display: false, // Clean look
-                        grid: { display: false }
-                    },
+                    x: { display: false },
                     y: {
-                        min: 2,
-                        max: 6,
+                        min: 2, max: 6,
                         grid: { color: 'rgba(255, 255, 255, 0.05)' },
                         ticks: { color: '#64748b' },
                         border: { display: false }
@@ -171,12 +202,16 @@ export default function LiveDashboardPreview() {
         };
 
         chartRef.current = new ChartJS(canvasRef.current, config);
+        return () => { if (chartRef.current) chartRef.current.destroy(); };
+    }, []);
 
-        return () => {
-            if (chartRef.current) {
-                chartRef.current.destroy();
-            }
-        };
+    // Time Ago simulation
+    const [timeAgo, setTimeAgo] = useState('Just now');
+    useEffect(() => {
+        const t = setInterval(() => {
+            setTimeAgo(Math.random() > 0.3 ? 'Just now' : '1s ago');
+        }, 1000);
+        return () => clearInterval(t);
     }, []);
 
     return (
@@ -185,94 +220,94 @@ export default function LiveDashboardPreview() {
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
 
             {/* Main Glass Panel */}
-            <div className="relative rounded-2xl bg-card border border-border shadow-2xl backdrop-blur-xl overflow-hidden transform transition-all duration-700 hover:scale-[1.01]">
+            <div className="relative rounded-2xl bg-card border border-border shadow-2xl backdrop-blur-xl overflow-hidden transform transition-all duration-700 hover:scale-[1.01] flex flex-col md:flex-row">
 
-                {/* Header / Toolbar */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background/50">
-                    <div className="flex items-center gap-3">
-                        <div className="flex gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-status-error/30 border border-status-error"></div>
-                            <div className="w-3 h-3 rounded-full bg-status-warning/30 border border-status-warning"></div>
-                            <div className="w-3 h-3 rounded-full bg-status-success/30 border border-status-success"></div>
+                {/* Visual Sidebar (Mimics DeviceCard) */}
+                <div className="md:w-1/3 lg:w-1/4 bg-slate-900/50 p-6 flex flex-col border-r border-border">
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-slate-800/50 rounded-lg border border-white/5">
+                                <DeviceTypeIcon type="fridge" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white tracking-tight">
+                                    Main Fridge
+                                </h3>
+                                <p className="text-xs text-slate-500 font-mono">ID: REF-001</p>
+                            </div>
                         </div>
-                        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-secondary/50 border border-border text-xs font-mono text-muted-foreground">
-                            <Activity className="w-3 h-3" />
-                            <span>koelkast-main-01.live</span>
+                        <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider border backdrop-blur-md bg-status-online/10 text-status-online border-status-online/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                            ONLINE
+                        </span>
+                    </div>
+
+                    {/* Metrics Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 mb-auto">
+                        <SensorMetric
+                            label="WIRED"
+                            value={wiredTemp}
+                            colorClass="text-sensor-wired"
+                            borderColorClass="border-sensor-wired/10"
+                            bgClass="bg-sensor-wired"
+                        />
+                        <SensorMetric
+                            label="WIRELESS"
+                            value={currentTemp}
+                            colorClass="text-sensor-wireless"
+                            borderColorClass="border-sensor-wireless/10"
+                            bgClass="bg-sensor-wireless"
+                        />
+                        <div className="col-span-2 lg:col-span-1">
+                            <HumidityBanner value={humidity} />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    {/* Footer Metrics */}
+                    <div className="mt-6 pt-4 border-t border-white/5 space-y-3">
+                        <div className="flex justify-between text-sm items-center">
+                            <span className="text-slate-500 font-medium text-xs">Last Seen:</span>
+                            <span className="text-slate-300 font-mono text-xs bg-slate-800/50 px-2 py-0.5 rounded">
+                                {timeAgo}
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-slate-500 text-xs font-medium">Signal Strength</span>
+                            <div className="scale-90 origin-right">
+                                <SignalIcon rssi={rssi} />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-slate-500 text-xs font-medium">Battery (BLE)</span>
+                            <div className="flex items-center gap-2">
+                                <BatteryIcon level={battery} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Chart Area */}
+                <div className="md:w-2/3 lg:w-3/4 p-6 relative bg-gradient-to-b from-background/10 to-transparent flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
                             <span className="relative flex h-2.5 w-2.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success/75"></span>
                                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-status-success"></span>
                             </span>
-                            <span className="text-xs font-bold text-status-success uppercase tracking-wider">Live Stream</span>
+                            <span className="text-xs font-bold text-status-success uppercase tracking-wider">Live Monitoring</span>
                         </div>
-                        <div className="hidden sm:block text-xs text-muted-foreground tabular-nums opacity-60">
-                            Latency: 24ms
+                        <div className="flex gap-2">
+                            <div className="text-xs text-muted-foreground tabular-nums opacity-60">
+                                Latency: 24ms
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="flex-1 min-h-[300px] w-full">
+                        <canvas ref={canvasRef}></canvas>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 min-h-[400px]">
-                    {/* Sidebar Stats */}
-                    <div className="lg:col-span-1 border-r border-border bg-background/30 p-6 flex flex-col gap-6">
-
-                        <div className="space-y-1">
-                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Active Sensor</span>
-                            <div className="flex items-center gap-2 text-foreground font-medium">
-                                <Radio className="w-4 h-4 text-sensor-wireless" />
-                                <span>Wireless Probe #1</span>
-                            </div>
-                        </div>
-
-                        <div className="p-4 rounded-xl bg-background/50 border border-border">
-                            <span className="text-xs text-muted-foreground block mb-1">Current Temperature</span>
-                            <div className="flex items-end gap-2">
-                                <span className="text-4xl font-bold text-foreground tabular-nums tracking-tight">
-                                    {currentTemp.toFixed(1)}°C
-                                </span>
-                            </div>
-                            <div className="mt-2 h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                                <div className="h-full bg-sensor-wireless w-[65%] rounded-full"></div>
-                            </div>
-                        </div>
-
-                        <div className="p-4 rounded-xl bg-background/50 border border-border">
-                            <span className="text-xs text-muted-foreground block mb-1">Status Report</span>
-                            <div className="flex items-center gap-2 text-sm text-status-success font-medium">
-                                <Activity className="w-4 h-4" />
-                                <span>Optimal Range</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                                System is operating within HACCP parameters. No anomalies detected.
-                            </p>
-                        </div>
-
-                        <div className="mt-auto pt-6 border-t border-border">
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                    <Wifi className="w-3 h-3" /> Signal
-                                </span>
-                                <span className="font-mono">Strong (-42dBm)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Main Chart Area */}
-                    <div className="lg:col-span-3 p-6 relative bg-gradient-to-b from-background/10 to-transparent">
-                        <div className="absolute top-6 right-6 z-10 flex gap-2">
-                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">1H</span>
-                            <span className="px-2 py-1 rounded text-[10px] font-bold text-muted-foreground hover:bg-secondary transition-colors cursor-pointer">24H</span>
-                            <span className="px-2 py-1 rounded text-[10px] font-bold text-muted-foreground hover:bg-secondary transition-colors cursor-pointer">7D</span>
-                        </div>
-
-                        <div className="w-full h-full min-h-[300px]">
-                            <canvas ref={canvasRef}></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     );

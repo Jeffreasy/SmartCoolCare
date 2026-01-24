@@ -2,7 +2,8 @@ import { useState } from "react";
 import { ResponsiveModal } from "./ui/Modal";
 import type { Id } from "../../convex/_generated/dataModel";
 import { DeviceTypeIcon } from "./ui/icons";
-import DeviceDetailView, { type Device } from "./devices/DeviceDetailView";
+import DeviceDetailView from "./devices/DeviceDetailView";
+import type { BaseDeviceData } from "@/domain/device-types";
 
 interface DeviceDetailModalProps {
     device: any; // Using any to accept the raw Convex object, but casting inside component
@@ -10,7 +11,7 @@ interface DeviceDetailModalProps {
 }
 
 export default function DeviceDetailModal({ device: rawDevice, onClose }: DeviceDetailModalProps) {
-    const device = rawDevice as Device;
+    const device = rawDevice as BaseDeviceData;
     const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'settings'>('overview');
 
     const HeaderTitle = (
