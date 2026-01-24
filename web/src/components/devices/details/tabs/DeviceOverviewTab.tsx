@@ -10,7 +10,7 @@ interface DeviceOverviewTabProps {
 
 export default function DeviceOverviewTab({ device, isSensorNode = false }: DeviceOverviewTabProps) {
     return (
-        <div className="space-y-4 md:space-y-6 animate-in fade-in duration-300">
+        <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300 pb-8">
             <div className={`grid grid-cols-1 ${!isSensorNode ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
 
                 {/* 1. Wired Sensor (Fridge Only) */}

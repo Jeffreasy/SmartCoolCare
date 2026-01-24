@@ -16,7 +16,8 @@ interface TemperatureChartProps {
     minTemp?: number;
     maxTemp?: number;
     compact?: boolean;
-    enabledMetrics?: MetricType[]; // NEW: Control which data to show
+    frameless?: boolean;
+    enabledMetrics?: MetricType[];
 }
 
 export default function TemperatureChart({
@@ -24,7 +25,8 @@ export default function TemperatureChart({
     minTemp,
     maxTemp,
     compact = false,
-    enabledMetrics = ['wired', 'ble', 'humidity'] // Default to all for backward compat
+    frameless = false,
+    enabledMetrics = ['wired', 'ble', 'humidity']
 }: TemperatureChartProps) {
     // --- State ---
     const [timeRange, setTimeRange] = useState<TimeRange>('24H');
@@ -138,7 +140,7 @@ export default function TemperatureChart({
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: compact ? false : { // Disable animation in overview for stability
+                animation: compact ? false : {
                     duration: 750,
                 },
                 interaction: {
@@ -148,18 +150,18 @@ export default function TemperatureChart({
                 plugins: {
                     legend: {
                         display: !compact,
-                        position: 'top', // Clean top legend
+                        position: 'top',
                         align: 'end',
                         labels: {
                             color: '#94a3b8',
                             font: { family: 'Inter', size: 11 },
                             usePointStyle: true,
                             boxWidth: 6,
-                            padding: 15, // More padding to separate
+                            padding: 15,
                         }
                     },
                     tooltip: {
-                        enabled: !compact, // Disable tooltip in overview to prevent touch jumps
+                        enabled: !compact,
                         backgroundColor: 'rgba(15, 23, 42, 0.95)',
                         titleColor: '#f8fafc',
                         bodyColor: '#e2e8f0',
@@ -217,7 +219,6 @@ export default function TemperatureChart({
                         grid: { color: 'rgba(255, 255, 255, 0.05)' },
                         ticks: { color: '#64748b' },
                         title: { display: !compact, text: 'Temperature (°C)', color: '#475569' },
-                        // Lock the scale to prevent jumping
                         suggestedMin: minTemp ?? -5,
                         suggestedMax: maxTemp ?? 15,
                     },
@@ -242,7 +243,7 @@ export default function TemperatureChart({
                 chartRef.current.destroy();
             }
         };
-    }, [chartData, viewMode, minTemp, maxTemp, deviceName, timeRange, compact]);
+    }, [chartData, viewMode, minTemp, maxTemp, deviceName, timeRange, compact, enabledMetrics]);
 
 
     // --- Export Handlers ---
@@ -295,7 +296,7 @@ export default function TemperatureChart({
 
     if (isLoading) {
         return (
-            <div className={`glass-card p-8 flex items-center justify-center ${compact ? 'min-h-[150px] bg-transparent shadow-none border-none' : 'min-h-[300px]'}`}>
+            <div className={`p-8 flex items-center justify-center ${compact ? 'min-h-[150px]' : 'min-h-[300px]'} ${frameless ? '' : 'glass-card'}`}>
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -303,14 +304,14 @@ export default function TemperatureChart({
 
     if (!chartData || chartData.length === 0) {
         return (
-            <div className="h-[400px] flex items-center justify-center text-muted-foreground glass-card">
+            <div className={`h-[400px] flex items-center justify-center text-muted-foreground ${frameless ? '' : 'glass-card'}`}>
                 <p>No data available for selected time range</p>
             </div>
         );
     }
 
     return (
-        <div className={`glass-card p-4 space-y-4 ${compact ? 'border-none bg-transparent shadow-none p-0 !space-y-0 w-full overflow-hidden' : ''}`}>
+        <div className={`p-4 space-y-4 ${compact ? 'border-none bg-transparent shadow-none p-0 !space-y-0 w-full overflow-hidden' : ''} ${frameless ? '' : 'glass-card'}`}>
 
             {/* 1. Header Controls (Hidden in Compact Mode) */}
             {!compact && (
@@ -361,22 +362,12 @@ export default function TemperatureChart({
                         </div>
                     )}
 
-                    <canvas ref={canvasRef} className="flex-1"></canvas>
-
-                    {/* Zoom Reset for Full Mode */}
-                    {!compact && (
-                        <div className="absolute top-2 right-2 flex gap-2">
-                            <button
-                                onClick={() => chartRef.current?.resetZoom()}
-                                className="px-3 py-1 bg-popover/80 text-foreground text-xs rounded-lg hover:bg-popover transition-all border border-border"
-                            >
-                                Reset Zoom
-                            </button>
-                        </div>
-                    )}
+                    <canvas ref={canvasRef} />
                 </div>
             ) : (
-                <TemperatureTableView data={chartData} />
+                <div className="h-[300px] md:h-[450px] overflow-auto custom-scrollbar rounded-xl border border-white/5 bg-slate-950/30">
+                    <TemperatureTableView data={chartData} />
+                </div>
             )}
         </div>
     );
