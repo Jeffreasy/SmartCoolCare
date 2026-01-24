@@ -40,7 +40,22 @@ function DashboardContent() {
     if (devices) {
         stats.total = devices.length;
         stats.online = devices.filter(d => d.lastDeviceStatus !== "offline" && d.lastDeviceStatus !== "unknown").length;
-        stats.attention = devices.filter(d => d.lastDeviceStatus === "offline" || d.lastDeviceStatus === "degraded").length;
+        stats.attention = devices.filter(d => {
+            // 1. Critical Status
+            if (d.lastDeviceStatus === "offline" || d.lastDeviceStatus === "warning") return true;
+
+            // 2. Low Battery (< 20%)
+            if (d.lastBleBattery !== undefined && d.lastBleBattery < 20) return true;
+
+            // 3. Temperature Alerts (only if thresholds are set)
+            const min = d.minTemp ?? -100; // Use lenient defaults if not set
+            const max = d.maxTemp ?? 100;
+
+            if (d.lastWiredTemp !== undefined && (d.lastWiredTemp < min || d.lastWiredTemp > max)) return true;
+            if (d.lastBleTemp !== undefined && (d.lastBleTemp < min || d.lastBleTemp > max)) return true;
+
+            return false;
+        }).length;
 
         // Calculate Averages
         let totalWired = 0;
