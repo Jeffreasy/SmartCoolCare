@@ -3,6 +3,7 @@ import { Authenticated, Unauthenticated, useConvexAuth } from "convex/react";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import ConvexAuthProvider from "../ConvexAuthProvider";
+import { Button } from "@/components/ui/Button";
 
 export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) {
     const [scrolled, setScrolled] = useState(false);
@@ -38,12 +39,11 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                                         <a href="/#features" className="hover:text-foreground transition-colors">Features</a>
                                         <a href="/#pricing" className="hover:text-foreground transition-colors">Pricing</a>
                                     </div>
-                                    <a
-                                        href="/login"
-                                        className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 text-foreground text-sm font-medium transition-all border border-border backdrop-blur-sm"
-                                    >
-                                        Sign In
-                                    </a>
+                                    <Button asChild variant="default" size="sm">
+                                        <a href="/login">
+                                            Sign In
+                                        </a>
+                                    </Button>
                                 </SignedOut>
 
                                 <SignedIn>
@@ -102,7 +102,9 @@ export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) 
                                         <a href="/#features" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
                                         <a href="/#pricing" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Pricing</a>
                                         <div className="pt-2 border-t border-border">
-                                            <a href="/login" className="block w-full py-3 bg-primary rounded-lg text-primary-foreground font-medium" onClick={() => setIsMobileMenuOpen(false)}>Sign In</a>
+                                            <Button asChild className="w-full">
+                                                <a href="/login" onClick={() => setIsMobileMenuOpen(false)}>Sign In</a>
+                                            </Button>
                                         </div>
                                     </SignedOut>
                                     <SignedIn>

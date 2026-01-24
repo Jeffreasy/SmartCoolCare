@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import DeviceDetailPageIsland from "../../components/devices/DeviceDetailPageIsland";
+
+const { deviceId } = Astro.params;
+
+if (!deviceId) {
+    return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="Device Details">
+    <DeviceDetailPageIsland client:load deviceId={deviceId} />
+</Layout>

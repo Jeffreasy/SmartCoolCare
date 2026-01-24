@@ -4,10 +4,7 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				primary: {
-					DEFAULT: '#6366f1', // Indigo 500
-					hover: '#4f46e5',   // Indigo 600
-				},
+				// primary removed (duplicate), see below
 				secondary: '#a855f7', // Purple 500
 				success: '#10b981',   // Emerald 500
 				warning: '#f59e0b',   // Amber 500

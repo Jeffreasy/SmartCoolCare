@@ -20,18 +20,25 @@ export function DeviceTypeIcon({ type, className = "w-5 h-5" }: DeviceTypeIconPr
 
 export function SignalIcon({ rssi }: { rssi: number }) {
     let bars = 0;
-    let color = "text-status-error";
-    if (rssi > -50) { bars = 4; color = "text-status-success"; }
-    else if (rssi > -60) { bars = 3; color = "text-status-success"; }
-    else if (rssi > -70) { bars = 2; color = "text-status-warning"; }
-    else if (rssi > -80) { bars = 1; color = "text-status-warning"; }
+    let color = "bg-status-error";
+
+    // Fix: Handle 0, positive (invalid), or undefined values
+    if (!rssi || rssi >= 0) {
+        bars = 0;
+        color = "bg-slate-700"; // Grey for unknown
+    }
+    // Adjusted thresholds for realistic real-world usage
+    else if (rssi >= -60) { bars = 4; color = "bg-status-success"; } // Excellent
+    else if (rssi >= -70) { bars = 3; color = "bg-status-success"; } // Good
+    else if (rssi >= -80) { bars = 2; color = "bg-status-warning"; } // Fair
+    else if (rssi >= -90) { bars = 1; color = "bg-status-error"; }   // Weak
 
     return (
         <div className="flex items-end gap-[2px]" title={`Signal: ${rssi} dBm`}>
             {[1, 2, 3, 4].map(i => (
                 <div
                     key={i}
-                    className={`w-1 rounded-sm ${i <= bars ? color : 'bg-slate-700'}`}
+                    className={`w-1 rounded-sm ${i <= bars ? color : 'bg-white/10'}`}
                     style={{ height: `${i * 3 + 2}px` }}
                 />
             ))}
