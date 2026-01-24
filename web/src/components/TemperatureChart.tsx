@@ -202,29 +202,45 @@ export default function TemperatureChart({
                 },
                 scales: {
                     x: {
-                        display: !compact,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        display: true, // Always show time axis for context
+                        grid: {
+                            display: !compact, // Hide grid in compact to reduce clutter
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
                         ticks: {
+                            display: true, // Show labels
                             color: '#64748b',
                             autoSkip: true,
-                            maxTicksLimit: 6,
+                            maxTicksLimit: compact ? 4 : 8, // Reduce ticks in compact
                             maxRotation: 0,
-                            minRotation: 0
+                            minRotation: 0,
+                            font: { size: compact ? 10 : 12 } // Smaller font
                         }
                     },
                     y: {
                         type: 'linear',
-                        display: !compact,
+                        display: true, // Always show Y axis
                         position: 'left',
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#64748b' },
+                        grid: {
+                            display: !compact,
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: compact ? 10 : 12 },
+                            callback: function (value) {
+                                return compact ? Math.round(Number(value)) : value; // Simple integers for compact
+                            }
+                        },
                         title: { display: !compact, text: 'Temperature (°C)', color: '#475569' },
-                        suggestedMin: minTemp ?? -5,
-                        suggestedMax: maxTemp ?? 15,
+
+                        // Smart Scaling: Ignore extreme defaults (-50/+50) and focus on human range
+                        suggestedMin: (minTemp !== undefined && minTemp > -25) ? minTemp : -5,
+                        suggestedMax: (maxTemp !== undefined && maxTemp < 30) ? maxTemp : 15,
                     },
                     y1: {
                         type: 'linear',
-                        display: !compact,
+                        display: !compact, // Hide secondary axis in compact to save space
                         position: 'right',
                         grid: { drawOnChartArea: false },
                         ticks: { color: CHART_THEME.humidity.hex },
@@ -311,7 +327,7 @@ export default function TemperatureChart({
     }
 
     return (
-        <div className={`p-4 space-y-4 ${compact ? 'border-none bg-transparent shadow-none p-0 !space-y-0 w-full overflow-hidden' : ''} ${frameless ? '' : 'glass-card'}`}>
+        <div className={`glass-card p-4 space-y-4 ${compact ? 'border-none bg-transparent shadow-none p-0 !space-y-0 w-full h-full overflow-hidden' : ''} ${frameless ? '' : 'glass-card'}`}>
 
             {/* 1. Header Controls (Hidden in Compact Mode) */}
             {!compact && (
@@ -336,11 +352,11 @@ export default function TemperatureChart({
 
             {/* 3. Main Visualization Area */}
             {viewMode === 'chart' ? (
-                <div className={`relative w-full ${compact ? 'h-full min-h-[180px] flex flex-col' : 'h-[300px] md:h-[450px]'}`}>
+                <div className={`relative w-full ${compact ? 'h-full flex flex-col min-h-0' : 'h-[300px] md:h-[450px]'}`}>
 
                     {/* Compact Mode Legend */}
                     {compact && (
-                        <div className="flex items-center justify-end gap-3 mb-2 px-2">
+                        <div className="flex items-center justify-end gap-3 mb-2 px-2 shrink-0">
                             {enabledMetrics.includes('wired') && (
                                 <div className="flex items-center gap-1.5">
                                     <Plug className="w-3 h-3 text-sensor-wired" />
@@ -362,7 +378,9 @@ export default function TemperatureChart({
                         </div>
                     )}
 
-                    <canvas ref={canvasRef} />
+                    <div className={`${compact ? 'flex-1 min-h-0 relative' : 'h-full w-full relative'}`}>
+                        <canvas ref={canvasRef} />
+                    </div>
                 </div>
             ) : (
                 <div className="h-[300px] md:h-[450px] overflow-auto custom-scrollbar rounded-xl border border-white/5 bg-slate-950/30">
