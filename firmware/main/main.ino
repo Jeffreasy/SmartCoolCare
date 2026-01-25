@@ -221,13 +221,21 @@ void sendToConvex() {
     Serial.print(F("[WIFI] Connecting"));
     
     WiFi.mode(WIFI_STA);
+    
+    // Debug: Print actual MAC address
+    Serial.println();
+    Serial.print(F("[DEBUG] MAC Address: "));
+    Serial.println(WiFi.macAddress());
+    Serial.print(F("[DEBUG] Expected: "));
+    Serial.println(ESP32_DEVICE_MAC);
+    
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     
     // Max Power for robustness
     WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
     unsigned long start = millis();
-    while (WiFi.status() != WL_CONNECTED && (millis() - start) < 15000) {
+    while (WiFi.status() != WL_CONNECTED && (millis() - start) < 30000) {  // 30 sec timeout
         delay(500);
         Serial.print(".");
     }
@@ -280,10 +288,13 @@ void sendToConvex() {
     if (client && http) {
         client->setInsecure();
         
+        Serial.println("[DEBUG] Connecting to: " + String(CONVEX_URL));
+        
         if (http->begin(*client, CONVEX_URL)) {
             http->addHeader("Content-Type", "application/json");
-            http->addHeader("x-esp32-secret", CONVEX_SECRET);
+            http->addHeader("X-ESP32-Secret", CONVEX_SECRET); // Capital X!
             
+            Serial.println("[DEBUG] Sending POST...");
             int code = http->POST(json);
             
             if (code == 200) {
@@ -302,11 +313,19 @@ void sendToConvex() {
                     if (config.containsKey("tempOffsetWired")) deviceConfig.tempOffsetWired = config["tempOffsetWired"];
                     if (config.containsKey("tempOffsetBle")) deviceConfig.tempOffsetBle = config["tempOffsetBle"];
                 }
-            } else {
+            } else if (code > 0) {
                 Serial.printf("[TX] Error: HTTP %d\n", code);
+                Serial.println("[DEBUG] Response: " + http->getString());
+                totalErrors++;
+            } else {
+                Serial.printf("[TX] Connection failed: %d\n", code);
+                Serial.println("[DEBUG] Possible SSL/DNS issue");
                 totalErrors++;
             }
             http->end();
+        } else {
+            Serial.println("[TX] FATAL: Could not connect to server");
+            Serial.println("[DEBUG] Check URL and SSL certificate");
         }
         delete http;
         delete client;
