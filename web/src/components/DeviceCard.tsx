@@ -17,7 +17,8 @@ interface DeviceCardProps {
 }
 
 export default function DeviceCard(props: DeviceCardProps) {
-    const devices = useQuery(api.sensors.getLiveSensors);
+    // TEMPORARY: Use public query until JWT validation is fixed
+    const devices = useQuery(api.sensors.getAllDevicesPublic);
     const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
 
     // Find selected device from the list

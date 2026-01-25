@@ -1,12 +1,13 @@
-import { UserButton } from "@clerk/clerk-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import DeviceCard from "./DeviceCard";
 import DebugAuth from "./DebugAuth";
 import ConvexAuthProvider from "./ConvexAuthProvider";
 import AddDeviceModal from "./AddDeviceModal";
+import CustomUserButton from "./ui/CustomUserButton";
 import { useState } from "react";
 import { Plus, Server, Activity, AlertTriangle, Thermometer } from "lucide-react";
+import { useAuthSync } from "@/hooks/useAuthSync";
 
 function StatCard({ label, value, subtext, icon, color }: { label: string, value: string | number, subtext?: string, icon: any, color: string }) {
     return (
@@ -24,7 +25,11 @@ function StatCard({ label, value, subtext, icon, color }: { label: string, value
 }
 
 function DashboardContent() {
-    const devices = useQuery(api.sensors.getLiveSensors);
+    // Auto-sync user from LaventeCare to Convex
+    useAuthSync();
+
+    // TEMPORARY: Use public query until JWT validation is fixed
+    const devices = useQuery(api.sensors.getAllDevicesPublic);
     const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
 
     // Calculate Stats
@@ -104,7 +109,7 @@ function DashboardContent() {
                     </button>
                     <span className="hidden sm:block w-px h-6 bg-white/10 mx-1"></span>
                     <span className="hidden sm:block text-sm text-slate-400">Manage Account</span>
-                    <UserButton />
+                    <CustomUserButton />
                 </div>
             </div>
 

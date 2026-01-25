@@ -234,6 +234,20 @@ export const getLiveSensors = query({
     },
 });
 
+/**
+ * TEMPORARY: Public query without auth for debugging
+ * TODO: Remove after JWT validation is fixed
+ */
+export const getAllDevicesPublic = query({
+    args: {},
+    handler: async (ctx) => {
+        console.log("[getAllDevicesPublic] Fetching all devices (no auth check)");
+        const devices = await ctx.db.query("devices").collect();
+        console.log(`[getAllDevicesPublic] Found ${devices.length} devices`);
+        return devices;
+    },
+});
+
 // ========================================================================
 // 3. GET TEMPERATURE HISTORY (Wired + BLE)
 // ========================================================================

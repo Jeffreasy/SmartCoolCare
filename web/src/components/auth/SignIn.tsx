@@ -1,9 +1,9 @@
-import { SignIn } from "@clerk/clerk-react";
+import CustomSignIn from './CustomSignIn';
 
 export default function SignInPage() {
     return (
         <div className="flex justify-center items-center w-full p-4">
-            <SignIn signUpUrl="/signup" forceRedirectUrl="/dashboard" />
+            <CustomSignIn />
         </div>
     );
 }

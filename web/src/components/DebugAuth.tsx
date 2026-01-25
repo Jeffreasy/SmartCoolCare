@@ -1,59 +1,58 @@
-import { useConvexAuth } from "convex/react";
-import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
-import React from "react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { useCustomAuth } from "@/hooks/useCustomAuth";
+import React, { useState } from "react";
+import { api } from "../../convex/_generated/api";
 
 export default function DebugAuth() {
     const { isLoading: convexLoading, isAuthenticated: convexAuth } = useConvexAuth();
-    const { isLoaded: clerkLoaded, isSignedIn: clerkSignedIn, userId } = useClerkAuth();
-    const { user } = useUser();
-
-    const { getToken } = useClerkAuth();
-    const [tokenStatus, setTokenStatus] = React.useState<string>("Checking...");
-
-    React.useEffect(() => {
-        async function checkToken() {
-            if (!clerkSignedIn) {
-                setTokenStatus("No User");
-                return;
-            }
-            try {
-                const token = await getToken({ template: "convex" });
-                if (token) {
-                    setTokenStatus("✅ Minted");
-                } else {
-                    setTokenStatus("❌ Empty (Check Clerk Template!)");
-                }
-            } catch (e) {
-                console.error(e);
-                setTokenStatus("❌ Error (Check Console)");
-            }
-        }
-        checkToken();
-    }, [clerkSignedIn, getToken]);
+    const { isAuthenticated, isLoading, user, token } = useCustomAuth();
+    const convexUser = useQuery(api.users.getCurrentUser);
+    const [showToken, setShowToken] = useState(false);
 
     return (
         <div className="fixed bottom-2 right-2 z-[9999] glass-panel bg-slate-900/90 p-4 text-xs text-left font-mono pointer-events-auto min-w-[200px]">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div className="text-slate-400">Convex:</div>
-                <div className={convexAuth ? "text-success" : "text-danger"}>
-                    {convexLoading ? "..." : convexAuth ? "✅ IN" : "❌ OUT"}
+                <div className={convexAuth ? "text-success" : convexLoading ? "text-warning" : "text-danger"}>
+                    {convexLoading ? "⏳ Loading..." : convexAuth ? "✅ IN" : "❌ OUT"}
                 </div>
 
-                <div className="text-slate-400">Clerk:</div>
-                <div className={clerkSignedIn ? "text-success" : "text-danger"}>
-                    {!clerkLoaded ? "..." : clerkSignedIn ? "✅ IN" : "❌ OUT"}
+                <div className="text-slate-400">LaventeCare:</div>
+                <div className={isAuthenticated ? "text-success" : isLoading ? "text-warning" : "text-danger"}>
+                    {isLoading ? "⏳ Loading..." : isAuthenticated ? "✅ IN" : "❌ OUT"}
                 </div>
 
                 <div className="text-slate-400">Token:</div>
-                <div className={tokenStatus.startsWith("✅") ? "text-success" : "text-danger"}>
-                    {tokenStatus}
+                <div className={token ? "text-success" : "text-danger"}>
+                    {token ? "✅ Present" : "❌ Missing"}
                 </div>
 
-                {userId && (
+                <div className="text-slate-400">Convex User:</div>
+                <div className={convexUser ? "text-success" : "text-warning"}>
+                    {convexUser ? "✅ Synced" : "⚠️ Not Synced"}
+                </div>
+
+                {user && (
                     <>
                         <div className="text-slate-400">User:</div>
-                        <div className="truncate max-w-[150px]">{user?.primaryEmailAddress?.emailAddress}</div>
+                        <div className="truncate max-w-[150px]">{user.email}</div>
                     </>
+                )}
+
+                {token && (
+                    <div className="col-span-2 mt-2 pt-2 border-t border-slate-700">
+                        <button
+                            onClick={() => setShowToken(!showToken)}
+                            className="text-slate-400 hover:text-white transition-colors"
+                        >
+                            {showToken ? "🔒 Hide" : "🔓 Show"} Token
+                        </button>
+                        {showToken && (
+                            <div className="mt-2 p-2 bg-black/30 rounded text-[9px] break-all max-w-[300px]">
+                                {token}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

@@ -22,7 +22,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Simplistic check: If dashboard and no cookie -> redirect
     // Note: This is "Soft Protection". Real protection is in the Data Query (which returns []).
 
-    // Check for either the generic Convex token OR the standard Clerk session cookie
+    // Check for LaventeCare auth token
     const token = context.cookies.get("__convexAuthToken")?.value || context.cookies.get("__session")?.value;
 
     if (isProtectedRoute && !token) {
