@@ -1,6 +1,7 @@
 import { useQuery, useConvexAuth } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import ConvexAuthProvider from "../ConvexAuthProvider";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import ConvexClientProvider from "../ConvexClientProvider";
 import DeviceDetailView from "./DeviceDetailView";
 import { ArrowLeft } from "lucide-react";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -9,9 +10,11 @@ import type { BaseDeviceData } from "@/domain/device-types";
 // Wrapper to provide Context providers
 export default function DeviceDetailPageIsland({ deviceId }: { deviceId: string }) {
     return (
-        <ConvexAuthProvider>
-            <DeviceDetailPageContent deviceId={deviceId} />
-        </ConvexAuthProvider>
+        <AuthProvider>
+            <ConvexClientProvider>
+                <DeviceDetailPageContent deviceId={deviceId} />
+            </ConvexClientProvider>
+        </AuthProvider>
     );
 }
 

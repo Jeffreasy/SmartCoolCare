@@ -1,12 +1,12 @@
 import CustomSignIn from "./CustomSignIn";
-import ConvexAuthProvider from "../ConvexAuthProvider";
+import { AuthProvider } from "./AuthContext";
 
 export default function LoginPageIsland() {
     return (
-        <ConvexAuthProvider>
+        <AuthProvider>
             <div className="flex justify-center items-center w-full">
                 <CustomSignIn />
             </div>
-        </ConvexAuthProvider>
+        </AuthProvider>
     );
 }

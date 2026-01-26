@@ -11,6 +11,7 @@ export default function CustomSignIn() {
     const [isLoading, setIsLoading] = useState(false);
     const [showMFA, setShowMFA] = useState(false);
     const [preAuthToken, setPreAuthToken] = useState('');
+    const [userId, setUserId] = useState('');
 
     const { login, verifyMFA } = useCustomAuth();
 
@@ -31,6 +32,7 @@ export default function CustomSignIn() {
                 // Show MFA input
                 setShowMFA(true);
                 setPreAuthToken(result.preAuthToken || '');
+                setUserId(result.userId || '');
                 toast.info('Please enter your MFA code');
             } else if (result.success) {
                 toast.success('Successfully logged in!');
@@ -56,7 +58,7 @@ export default function CustomSignIn() {
         setIsLoading(true);
 
         try {
-            await verifyMFA(mfaCode, preAuthToken);
+            await verifyMFA(mfaCode, userId, preAuthToken);
             toast.success('Successfully logged in!');
             window.location.href = '/dashboard';
         } catch (error) {

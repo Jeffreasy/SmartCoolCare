@@ -2,7 +2,8 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import DeviceCard from "./DeviceCard";
 import DebugAuth from "./DebugAuth";
-import ConvexAuthProvider from "./ConvexAuthProvider";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import ConvexClientProvider from "./ConvexClientProvider";
 import AddDeviceModal from "./AddDeviceModal";
 import CustomUserButton from "./ui/CustomUserButton";
 import { useState } from "react";
@@ -28,8 +29,8 @@ function DashboardContent() {
     // Auto-sync user from LaventeCare to Convex
     useAuthSync();
 
-    // TEMPORARY: Use public query until JWT validation is fixed
-    const devices = useQuery(api.sensors.getAllDevicesPublic);
+    // Secure: Use authenticated query
+    const devices = useQuery(api.sensors.getLiveSensors);
     const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
 
     // Calculate Stats
@@ -167,8 +168,10 @@ function DashboardContent() {
 
 export default function ConnectedDashboard() {
     return (
-        <ConvexAuthProvider>
-            <DashboardContent />
-        </ConvexAuthProvider>
+        <AuthProvider>
+            <ConvexClientProvider>
+                <DashboardContent />
+            </ConvexClientProvider>
+        </AuthProvider>
     );
 }

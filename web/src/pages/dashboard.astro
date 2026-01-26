@@ -5,53 +5,14 @@
  */
 import Layout from "../layouts/Layout.astro";
 import ConnectedDashboard from "../components/ConnectedDashboard";
+import DashboardHeader from "../components/dashboard/DashboardHeader.astro";
 ---
 
 <Layout title="Koelkast Dashboard" disableNavbarAuth={true}>
-  <div
-    class="min-h-screen bg-background text-foreground p-4 md:p-8 relative overflow-hidden"
+  <DashboardHeader
+    title="System Overview"
+    subtitle="Real-time telemetry & device status"
   >
-    <!-- Background Ambient -->
-    <div
-      class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_50%)]"
-    >
-    </div>
-
-    <main class="max-w-[1400px] mx-auto relative z-10 pt-20 md:pt-24">
-      <header class="mb-6 md:mb-8">
-        <div class="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-          <span>Dashboard</span>
-        </div>
-        <div
-          class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4"
-        >
-          <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-foreground">
-              System Overview
-            </h1>
-            <p class="text-muted-foreground mt-1 text-sm md:text-base">
-              Real-time telemetry & device status
-            </p>
-          </div>
-          <div class="w-full md:w-auto">
-            <div
-              class="glass-card px-4 py-2 flex items-center justify-center md:justify-start gap-2 text-sm text-muted-foreground w-full md:w-auto"
-              aria-label="System Status: Online"
-              role="status"
-            >
-              <span class="w-2 h-2 rounded-full bg-success animate-pulse"
-              ></span>
-              System Online
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div id="dashboard-root" class="w-full">
-        <!-- React component wordt hier gehydrateerd met Convex provider -->
-        <!-- React component wordt hier gehydrateerd met interne Convex provider -->
-        <ConnectedDashboard client:only="react" />
-      </div>
-    </main>
-  </div>
+    <ConnectedDashboard client:only="react" />
+  </DashboardHeader>
 </Layout>
