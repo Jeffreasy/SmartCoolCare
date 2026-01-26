@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-const AUTH_API_URL = import.meta.env.PUBLIC_AUTH_API_URL;
+const AUTH_API_URL = import.meta.env.PUBLIC_AUTH_API_URL || 'https://laventecareauthsystems.onrender.com';
 
 export const GET: APIRoute = async ({ request }) => {
     try {
