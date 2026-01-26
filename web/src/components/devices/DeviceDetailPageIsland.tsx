@@ -1,6 +1,6 @@
-import { useQuery, useConvexAuth } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthProvider, useAuth } from "@/components/auth/AuthContext";
 import ConvexClientProvider from "../ConvexClientProvider";
 import DeviceDetailView from "./DeviceDetailView";
 import { ArrowLeft } from "lucide-react";
@@ -19,7 +19,7 @@ export default function DeviceDetailPageIsland({ deviceId }: { deviceId: string 
 }
 
 function DeviceDetailPageContent({ deviceId }: { deviceId: string }) {
-    const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+    const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
     const devices = useQuery(api.sensors.getLiveSensors);
 
     // 1. Auth Loading

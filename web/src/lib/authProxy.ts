@@ -72,11 +72,17 @@ export const createAuthProxy = ({ method, endpoint, requiresAuth = false }: Auth
             } else if (contentType && contentType.includes('application/json')) {
                 data = await response.json();
             } else {
-                // If not JSON, it is an error or unexpected state.
+                // If not JSON, it might be an empty 200 OK (common backend quirk)
                 const text = await response.text();
-                // We log the violation but return a 500 to the client via the catch block
-                console.error('❌ Backend Violation: Expected JSON, got', contentType, text.substring(0, 50));
-                throw new Error('Invalid Backend Response: Missing JSON Header');
+
+                if (!text || text.trim().length === 0) {
+                    // Safe violation: Empty body. Treat as success/null.
+                    data = null;
+                } else {
+                    // Unsafe violation: Non-empty body with no/wrong header. Potential XSS/Sniffing risk.
+                    console.error('❌ Backend Violation: Expected JSON, got', contentType, text.substring(0, 50));
+                    throw new Error('Invalid Backend Response: Missing JSON Header');
+                }
             }
 
             return new Response(JSON.stringify(data), {
