@@ -87,6 +87,7 @@ export default {
 			animation: {
 				'pulse-slow': 'pulse-slow 8s infinite ease-in-out',
 				'gradient': 'gradient 8s linear infinite',
+				'shimmer': 'shimmer 3s linear infinite',
 			},
 			// Add custom Perspective for 3D transforms
 			backgroundImage: {
@@ -102,6 +103,10 @@ export default {
 					'0%': { backgroundPosition: '0% 50%' },
 					'50%': { backgroundPosition: '100% 50%' },
 					'100%': { backgroundPosition: '0% 50%' },
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '200% center' },
+					'100%': { backgroundPosition: '-200% center' },
 				},
 			},
 		},

@@ -26,7 +26,7 @@ function NavbarContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <a href="/" className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                        <a href="/" className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-shimmer bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                             SmartCool Care
                         </a>
                     </div>
@@ -36,14 +36,23 @@ function NavbarContent() {
                         {!isAuthenticated ? (
                             <>
                                 <div className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
-                                    <a href="/#features" className="hover:text-foreground transition-colors">Features</a>
+                                    <a href="/#problem" className="hover:text-foreground transition-colors">Problem</a>
+                                    <a href="/#technology" className="hover:text-foreground transition-colors">Technology</a>
+                                    <a href="/#solution" className="hover:text-foreground transition-colors">Solution</a>
                                     <a href="/#pricing" className="hover:text-foreground transition-colors">Pricing</a>
                                 </div>
-                                <Button asChild variant="default" size="sm">
-                                    <a href="/login">
-                                        Sign In
-                                    </a>
-                                </Button>
+                                <div className="flex items-center gap-3">
+                                    <Button asChild variant="ghost" size="sm">
+                                        <a href="/login">
+                                            Sign In
+                                        </a>
+                                    </Button>
+                                    <Button asChild variant="default" size="sm">
+                                        <a href="/signup">
+                                            Sign Up
+                                        </a>
+                                    </Button>
+                                </div>
                             </>
                         ) : (
                             <>
@@ -84,11 +93,16 @@ function NavbarContent() {
                         <div className="flex flex-col space-y-4 text-center">
                             {!isAuthenticated ? (
                                 <>
-                                    <a href="/#features" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+                                    <a href="/#problem" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Problem</a>
+                                    <a href="/#technology" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Technology</a>
+                                    <a href="/#solution" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Solution</a>
                                     <a href="/#pricing" className="text-muted-foreground hover:text-foreground py-2" onClick={() => setIsMobileMenuOpen(false)}>Pricing</a>
-                                    <div className="pt-2 border-t border-border">
-                                        <Button asChild className="w-full">
+                                    <div className="pt-2 border-t border-border flex flex-col gap-2">
+                                        <Button asChild variant="ghost" className="w-full">
                                             <a href="/login" onClick={() => setIsMobileMenuOpen(false)}>Sign In</a>
+                                        </Button>
+                                        <Button asChild variant="default" className="w-full">
+                                            <a href="/signup" onClick={() => setIsMobileMenuOpen(false)}>Sign Up</a>
                                         </Button>
                                     </div>
                                 </>
