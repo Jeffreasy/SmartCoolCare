@@ -13,7 +13,7 @@ Successfully established the full end-to-end IoT telemetry pipeline and migrated
 | **IoT Gatekeeper** | 🟢 **Stable** | High (Bcrypt + Secrets) | 4/4 Devices reporting every 5m |
 | **Go Backend** | 🟢 **Stable** | High (RS256 JWT) | OIDC Discovery + JWKS Live |
 | **Convex Ingest** | 🟢 **Stable** | High (Deploy Keys) | Data securely stored in DB |
-| **Frontend Auth** | � **Stable** | High (OIDC + RLS) | **Full Identity Mapping Working** |
+| **Frontend Auth** | 🟢 **Stable** | High (OIDC + RLS) | **Full Identity Mapping Working** |
 
 ---
 
@@ -37,6 +37,7 @@ Complete removal of Clerk dependency, replaced with proprietary system.
 *   **Fixes**:
     *   Corrected JWT `iss` (Issuer) to match Convex expectations.
     *   Unified API field naming convention (snake_case -> camelCase mapping in frontend).
+    *   **Hotfix**: Added missing `/api/v1/auth/logout` route to backend router (resolved 404 error).
 
 ### 3. Dashboard Integration
 *   Devices visualization fully implemented.
@@ -116,6 +117,7 @@ Tijdens het testen bleek dat de backend CORS preflight requests (OPTIONS) blokke
     *   `me.ts`
     *   `logout.ts`
 *   **Updates**: De `useCustomAuth` hook en componenten zijn aangepast om deze lokale endpoints te gebruiken in plaats van direct naar de backend te gaan.
+*   **Hotfix**: Ontbrekende `/auth/logout` route toegevoegd aan de Go-backend om 404 errors op te lossen.
 
 #### 6. De Finale Doorbraak: Convex Auth Fix 🚀
 Na de migratie faalde de identity mapping in Convex.
@@ -127,3 +129,37 @@ Na de migratie faalde de identity mapping in Convex.
 De applicatie is volledig gemigreerd naar de nieuwe authenticatie architectuur. Alle Clerk afhankelijkheden zijn weg. De auth werkt volledig veilig en correct End-to-End.
 
 *Zie `walkthrough.md` en `cleanup_walkthrough.md` voor meer details.*
+
+---
+
+## 🎨 Session Log: Login Page Refactoring & UI Pro Max
+**Date:** 26 January 2026 (Session 2)
+**Focus:** Code Hygiene, Security Configuration, and High-End UI Implementation.
+
+### 1. Codebase Refactoring & Cleanup
+*   **Legacy Removal**: Removed 25+ lines of dead CSS from `web/src/pages/login.astro` that were previously overriding Clerk styles (no longer needed).
+*   **Configuration Hardening**: Refactored 6 API endpoints in `web/src/pages/api/auth/` to use environment variables instead of hardcoded URLs.
+    *   *Modified*: `login.ts`, `register.ts`, `me.ts`, `logout.ts`, `refresh.ts`, `mfa/verify.ts`.
+    *   *Implementation*: Switched from string literal to `import.meta.env.PUBLIC_AUTH_API_URL`.
+
+### 2. UI/UX Bug Fixes
+*   **"Double Card" Bug**: Fixed a visual issue where the Login Page displayed nested cards/borders.
+    *   *Root Cause*: `login.astro` was wrapping the `CustomSignIn` component (which has its own card styling) in another `.glass-panel` container.
+    *   *Fix*: Removed the outer wrapper and header from `login.astro`, delegating full rendering control to the React Island.
+
+### 3. "UI Pro Max" Implementation
+Transitioned the Login Form (`CustomSignIn.tsx`) to a premium aesthetic.
+
+*   **Iconography**: Integrated `lucide-react` icons (`Mail`, `Lock`, `KeyRound`, `ArrowRight`) for enhanced visual cues.
+*   **Deep Glassmorphism**:
+    *   Upgraded to `backdrop-blur-2xl`.
+    *   Added subtle `border-white/10` and `ring-white/5` for depth.
+    *   Implemented `shadow-glow` effects on active states.
+*   **Interaction Design**:
+    *   Input fields now have focus ring animations (`ring-primary/50`).
+    *   Buttons feature hover animations (arrow translation).
+    *   Inputs standardized to high-contrast semi-transparent dark theme (`bg-black/20`).
+*   **Visual Polish**: Added decorative background "glow blobs" to the card container for a modern, 3D-like feel.
+
+### 4. Result
+The authentication flow now matches the premium standard of the rest of the application, with a codebase that is cleaner and easier to maintain.

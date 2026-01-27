@@ -28,6 +28,7 @@ export const GET: APIRoute = async ({ params }) => {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include', // ✅ For cookie-based auth support
         });
 
         const data = await response.json();

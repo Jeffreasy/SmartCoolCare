@@ -3,8 +3,6 @@ import Cookies from 'js-cookie';
 import { useTenant } from '@/contexts/TenantContext';
 
 // Configuration
-const AUTH_TOKEN_KEY = 'auth_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
 const AUTH_API_URL = '/api/auth';
 
 // Types
@@ -69,36 +67,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token: null,
     });
 
-    // Helper: LocalStorage Management
-    const getToken = useCallback(() => {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem(AUTH_TOKEN_KEY);
-    }, []);
-
-    const getRefreshToken = useCallback(() => {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem(REFRESH_TOKEN_KEY);
-    }, []);
-
-    const setTokens = useCallback((accessToken: string | null, refreshToken: string | null) => {
-        if (typeof window === 'undefined') return;
-        if (accessToken) {
-            localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-            setAuthCookie(accessToken);
-        } else {
-            localStorage.removeItem(AUTH_TOKEN_KEY);
-            setAuthCookie(null);
-        }
-
-        if (refreshToken) {
-            localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-        } else {
-            localStorage.removeItem(REFRESH_TOKEN_KEY);
-        }
-    }, []);
+    // Note: Tokens are now managed exclusively via HttpOnly cookies set by backend
+    // No client-side token storage (XSS protection)
 
     // Helper: Create auth headers with tenant context
-    const createAuthHeaders = useCallback((token?: string): HeadersInit => {
+    // Note: No Authorization header needed - backend reads tokens from HttpOnly cookies
+    const createAuthHeaders = useCallback((): HeadersInit => {
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
         };
@@ -108,20 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             headers['X-Tenant-ID'] = tenant.id;
         }
 
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
         return headers;
     }, [tenant]);
 
     // Helper: Fetch User Info (Validation Only)
-    // Used on page reload to validate token if we don't trust local storage user data persistence
-    // or if we want fresh data.
-    const fetchUserInfo = useCallback(async (token: string): Promise<User | null> => {
+    // Validates session using HttpOnly cookies (token sent automatically)
+    const fetchUserInfo = useCallback(async (): Promise<User | null> => {
         try {
             const response = await fetch(`${AUTH_API_URL}/me`, {
-                headers: createAuthHeaders(token),
+                headers: createAuthHeaders(),
+                credentials: 'include', // ✅ CRITICAL: Sends HttpOnly cookies
             });
 
             if (!response.ok) {
@@ -148,87 +118,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, [createAuthHeaders]);
 
+    // Singleton Refresh Pattern: Prevent race conditions during concurrent refresh attempts
+    let refreshPromise: Promise<{ success: boolean }> | null = null;
+
     // Refresh Session Logic
     const refreshSession = useCallback(async (): Promise<{ success: boolean }> => {
-        const refreshToken = getRefreshToken();
-        if (!refreshToken) return { success: false };
+        // ✅ Singleton pattern: only one refresh at a time
+        if (refreshPromise) {
+            return refreshPromise;
+        }
 
-        try {
-            // Note: Backend docs imply refresh logic but exact endpoint might need verification.
-            // Using standard /refresh endpoint.
-            const response = await fetch(`${AUTH_API_URL}/refresh`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refresh_token: refreshToken })
-            });
+        refreshPromise = (async () => {
+            try {
+                const response = await fetch(`${AUTH_API_URL}/refresh`, {
+                    method: 'POST',
+                    headers: createAuthHeaders(),
+                    credentials: 'include', // ✅ CRITICAL: Sends refresh_token cookie
+                });
 
-            const data = await response.json();
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({ error: 'Refresh failed' }));
+                    console.error('[Auth] Refresh failed:', data.error);
+                    // Strict logout on refresh failure
+                    setState({ isAuthenticated: false, isLoading: false, user: null, token: null });
+                    return { success: false };
+                }
 
-            if (!response.ok) {
-                console.error('[Auth] Refresh failed:', data.error);
-                // If refresh fails, strict logout
-                setTokens(null, null);
+                const data = await response.json();
+
+                // Backend sets new HttpOnly cookies automatically
+                // Fetch fresh user info to update state
+                const user = data.user || await fetchUserInfo();
+
+                if (user) {
+                    setState(prev => ({ ...prev, isAuthenticated: true, user, token: 'cookie-managed' }));
+                    return { success: true };
+                }
+
+                return { success: false };
+            } catch (error) {
+                console.error('[Auth] Refresh error:', error);
                 setState({ isAuthenticated: false, isLoading: false, user: null, token: null });
                 return { success: false };
+            } finally {
+                refreshPromise = null;
             }
+        })();
 
-            const newAccessToken = data.AccessToken || data.access_token;
-            const newRefreshToken = data.RefreshToken || data.refresh_token;
-            // Docs say "Refresh tokens are rotated on use", so we likely get a new one.
-
-            setTokens(newAccessToken, newRefreshToken || refreshToken);
-
-            // Optionally fetch fresh user info or just update state
-            // Ideally we get user in refresh response too, but if not we can use /me
-            const user = data.user ? data.user : await fetchUserInfo(newAccessToken);
-
-            if (user) {
-                setState(prev => ({ ...prev, isAuthenticated: true, token: newAccessToken, user }));
-                return { success: true };
-            }
-
-            return { success: false };
-        } catch (error) {
-            console.error('[Auth] Refresh error:', error);
-            return { success: false };
-        }
-    }, [getRefreshToken, setTokens, fetchUserInfo]);
+        return refreshPromise;
+    }, [createAuthHeaders, fetchUserInfo]);
 
     // Initialization
     useEffect(() => {
         const initAuth = async () => {
-            const token = getToken();
-
-            if (!token) {
-                setState(prev => ({ ...prev, isLoading: false }));
-                return;
-            }
-
-            // Verify logic - Try to get user
-            const user = await fetchUserInfo(token);
+            // ✅ Try to validate session using HttpOnly cookies
+            const user = await fetchUserInfo();
 
             if (user) {
                 setState({
                     isAuthenticated: true,
                     isLoading: false,
                     user,
-                    token: token,
+                    token: 'cookie-managed',
                 });
-                setAuthCookie(token);
+                setAuthCookie('cookie-managed'); // Sync with middleware
             } else {
-                // Token invalid/expired? Try refresh.
-                console.log('[Auth] Token invalid or expired, attempting refresh...');
+                // No valid session - try refresh
+                console.log('[Auth] No valid session, attempting refresh...');
                 const refreshResult = await refreshSession();
                 if (!refreshResult.success) {
-                    // Full logout if refresh fails
-                    setTokens(null, null);
                     setState(prev => ({ ...prev, isLoading: false }));
                 }
             }
         };
 
         initAuth();
-    }, [getToken, fetchUserInfo, refreshSession, setTokens]);
+    }, [fetchUserInfo, refreshSession]);
 
     // Actions
     const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
@@ -244,6 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const response = await fetch(`${AUTH_API_URL}/login`, {
                 method: 'POST',
                 headers: createAuthHeaders(),
+                credentials: 'include', // ✅ CRITICAL: Backend sets HttpOnly cookies
                 body: JSON.stringify({ email, password }),
             });
 
@@ -255,27 +221,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             // MFA Flow
             if (data.mfa_required) {
-                // Docs: "Return 200 OK with { "mfa_required": true, "user": ... }"
-                // We need to pass the userId to the next step
                 return {
                     success: false,
                     mfaRequired: true,
                     preAuthToken: data.pre_auth_token,
-                    userId: data.user?.id || data.user?.Id, // Capture ID for MFA
+                    userId: data.user?.id || data.user?.Id,
                 };
             }
 
             // Success Flow
-            const accessToken = data.AccessToken || data.access_token;
-            const refreshToken = data.RefreshToken || data.refresh_token;
-
-            setTokens(accessToken, refreshToken);
-
-            // Optimized: Use user from response directly (Dual-Token System standard)
-            // No need to call /me immediately
+            // ✅ Backend sets tokens as HttpOnly cookies automatically
+            // JSON response contains only user data (no tokens)
             let user = data.user;
             if (user) {
-                // Normalize user structure if needed
+                // Normalize user structure
                 user = {
                     id: user.id || user.Id,
                     email: user.email || user.Email,
@@ -289,8 +248,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isAuthenticated: !!user,
                 isLoading: false,
                 user,
-                token: accessToken,
+                token: 'cookie-managed',
             });
+
+            setAuthCookie('cookie-managed'); // Sync with middleware
 
             return { success: true };
         } catch (error) {
@@ -299,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error: error instanceof Error ? error.message : 'Unknown login error'
             };
         }
-    }, [tenant, createAuthHeaders, setTokens]);
+    }, [tenant, createAuthHeaders]);
 
     const verifyMFA = useCallback(async (code: string, userId: string, preAuthToken?: string) => {
         if (!tenant?.id) {
@@ -310,29 +271,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-            const headers = createAuthHeaders(preAuthToken);
-
             const response = await fetch(`${AUTH_API_URL}/mfa/verify`, {
                 method: 'POST',
-                headers,
+                headers: createAuthHeaders(),
+                credentials: 'include', // ✅ CRITICAL: Backend sets HttpOnly cookies
                 body: JSON.stringify({
                     userId,
-                    code
+                    code,
+                    pre_auth_token: preAuthToken,
                 }),
             });
 
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'MFA failed');
 
-            const accessToken = data.AccessToken || data.access_token;
-            const refreshToken = data.RefreshToken || data.refresh_token;
-
-            setTokens(accessToken, refreshToken);
-
-            // MFA response should also contain user? If not, fetch it.
+            // ✅ Backend sets tokens as HttpOnly cookies automatically
+            // Fetch or use user from response
             let user = data.user;
             if (!user) {
-                user = await fetchUserInfo(accessToken);
+                user = await fetchUserInfo();
             } else {
                 user = {
                     id: user.id || user.Id,
@@ -347,8 +304,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isAuthenticated: !!user,
                 isLoading: false,
                 user,
-                token: accessToken,
+                token: 'cookie-managed',
             });
+
+            setAuthCookie('cookie-managed'); // Sync with middleware
 
             return { success: true };
         } catch (error) {
@@ -357,24 +316,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error: error instanceof Error ? error.message : 'MFA verification failed'
             };
         }
-    }, [tenant, createAuthHeaders, setTokens, fetchUserInfo]);
+    }, [tenant, createAuthHeaders, fetchUserInfo]);
 
     const logout = useCallback(async () => {
         try {
-            const token = getToken();
-            const refreshToken = getRefreshToken();
-
-            if (refreshToken) {
-                // Docs: "User requests Logout with Refresh Token" -> "Revokes the entire family"
-                // Usually this means sending the refresh token to the logout endpoint
-                await fetch(`${AUTH_API_URL}/logout`, {
-                    method: 'POST',
-                    headers: createAuthHeaders(token || undefined),
-                    body: JSON.stringify({ refresh_token: refreshToken })
-                }).catch(console.error);
-            }
+            // Backend clears HttpOnly cookies
+            await fetch(`${AUTH_API_URL}/logout`, {
+                method: 'POST',
+                headers: createAuthHeaders(),
+                credentials: 'include', // ✅ CRITICAL: Sends cookies for backend to clear
+            }).catch(console.error);
         } finally {
-            setTokens(null, null);
+            setAuthCookie(null); // Clear middleware sync cookie
             setState({
                 isAuthenticated: false,
                 isLoading: false,
@@ -383,9 +336,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
             window.location.href = '/login';
         }
-    }, [tenant, createAuthHeaders, getToken, getRefreshToken, setTokens]);
+    }, [createAuthHeaders]);
 
-    const fetchAccessToken = async () => getToken();
+    // Deprecated: Token is managed by backend cookies
+    const fetchAccessToken = async () => null;
 
     return (
         <AuthContext.Provider value={{ ...state, login, logout, verifyMFA, refreshSession, fetchAccessToken }}>

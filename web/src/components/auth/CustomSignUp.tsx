@@ -80,6 +80,7 @@ export default function CustomSignUp() {
                     'Content-Type': 'application/json',
                     'X-Tenant-ID': tenant.id, // CRITICAL: Header, not body
                 },
+                credentials: 'include', // ✅ CRITICAL: For cookie-based auth
                 body: JSON.stringify({
                     email,
                     password,
