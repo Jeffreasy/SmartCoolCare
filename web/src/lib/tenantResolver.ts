@@ -18,7 +18,8 @@ export interface TenantContext {
 export class TenantResolver {
     private static CACHE_KEY = 'tenant_context';
     private static CACHE_DURATION = 1000 * 60 * 60; // 1 hour
-    private static API_URL = import.meta.env.PUBLIC_AUTH_API_URL || 'https://laventecareauthsystems.onrender.com';
+    // Use Astro proxy to avoid CORS issues
+    private static API_URL = '/api/v1';
 
     /**
      * Resolve tenant slug to full context
@@ -31,9 +32,9 @@ export class TenantResolver {
             return cached;
         }
 
-        // 2. Fetch from backend
+        // 2. Fetch via proxy endpoint (avoids CORS)
         console.log('[TenantResolver] Fetching tenant:', slug);
-        const response = await fetch(`${this.API_URL}/api/v1/tenants/${slug}`);
+        const response = await fetch(`${this.API_URL}/tenants/${slug}`);
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -90,6 +91,12 @@ export class TenantResolver {
         }
 
         const slug = parts[0];
+
+        // Handle www subdomain (root domain, no tenant)
+        if (slug === 'www' || parts.length === 2) {
+            throw new Error('No tenant context: visiting root domain. Tenant features disabled.');
+        }
+
         return this.resolve(slug);
     }
 
