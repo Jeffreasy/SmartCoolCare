@@ -90,11 +90,12 @@ export class TenantResolver {
             throw new Error('Invalid hostname: cannot extract subdomain');
         }
 
-        const slug = parts[0];
+        let slug = parts[0];
 
-        // Handle www subdomain (root domain, no tenant)
+        // Handle www subdomain - map to smartcoolcare tenant for single-tenant deployment
         if (slug === 'www' || parts.length === 2) {
-            throw new Error('No tenant context: visiting root domain. Tenant features disabled.');
+            console.log('[TenantResolver] WWW subdomain detected, mapping to smartcoolcare tenant');
+            slug = 'smartcoolcare';
         }
 
         return this.resolve(slug);
