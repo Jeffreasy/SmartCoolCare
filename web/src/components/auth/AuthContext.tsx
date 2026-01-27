@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import Cookies from 'js-cookie';
+import { useTenant } from '@/contexts/TenantContext';
 
 // Configuration
 const AUTH_TOKEN_KEY = 'auth_token';
@@ -59,6 +60,8 @@ const setAuthCookie = (token: string | null) => {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+    const { tenant } = useTenant(); // Inject tenant context
+
     const [state, setState] = useState<AuthState>({
         isAuthenticated: false,
         isLoading: true,
@@ -94,16 +97,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    // Helper: Create auth headers with tenant context
+    const createAuthHeaders = useCallback((token?: string): HeadersInit => {
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+
+        // CRITICAL: Add X-Tenant-ID header for strict isolation
+        if (tenant?.id) {
+            headers['X-Tenant-ID'] = tenant.id;
+        }
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        return headers;
+    }, [tenant]);
+
     // Helper: Fetch User Info (Validation Only)
     // Used on page reload to validate token if we don't trust local storage user data persistence
     // or if we want fresh data.
     const fetchUserInfo = useCallback(async (token: string): Promise<User | null> => {
         try {
             const response = await fetch(`${AUTH_API_URL}/me`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+                headers: createAuthHeaders(token),
             });
 
             if (!response.ok) {
@@ -128,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('[Auth] Fetch user failed:', error);
             return null;
         }
-    }, []);
+    }, [createAuthHeaders]);
 
     // Refresh Session Logic
     const refreshSession = useCallback(async (): Promise<{ success: boolean }> => {
@@ -214,10 +232,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Actions
     const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
+        // Validate tenant context is available
+        if (!tenant?.id) {
+            return {
+                success: false,
+                error: 'Tenant context not available. Please refresh the page.'
+            };
+        }
+
         try {
             const response = await fetch(`${AUTH_API_URL}/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: createAuthHeaders(),
                 body: JSON.stringify({ email, password }),
             });
 
@@ -273,18 +299,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error: error instanceof Error ? error.message : 'Unknown login error'
             };
         }
-    }, [setTokens]);
+    }, [tenant, createAuthHeaders, setTokens]);
 
     const verifyMFA = useCallback(async (code: string, userId: string, preAuthToken?: string) => {
+        if (!tenant?.id) {
+            return {
+                success: false,
+                error: 'Tenant context not available'
+            };
+        }
+
         try {
-            // Docs: "Input: UserID + Code"
-            // We send userId in body. use preAuthToken in Header IF required, but docs said Auth Header ❌.
-            // We will stick to Docs: Body { userId, code }.
-            // If legacy system needs header, we can add it safely.
-            const headers: HeadersInit = { 'Content-Type': 'application/json' };
-            if (preAuthToken) {
-                headers['Authorization'] = `Bearer ${preAuthToken}`;
-            }
+            const headers = createAuthHeaders(preAuthToken);
 
             const response = await fetch(`${AUTH_API_URL}/mfa/verify`, {
                 method: 'POST',
@@ -331,7 +357,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error: error instanceof Error ? error.message : 'MFA verification failed'
             };
         }
-    }, [setTokens, fetchUserInfo]);
+    }, [tenant, createAuthHeaders, setTokens, fetchUserInfo]);
 
     const logout = useCallback(async () => {
         try {
@@ -343,10 +369,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Usually this means sending the refresh token to the logout endpoint
                 await fetch(`${AUTH_API_URL}/logout`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, // Pass access token for context
-                        'Content-Type': 'application/json'
-                    },
+                    headers: createAuthHeaders(token || undefined),
                     body: JSON.stringify({ refresh_token: refreshToken })
                 }).catch(console.error);
             }
@@ -360,7 +383,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
             window.location.href = '/login';
         }
-    }, [getToken, getRefreshToken, setTokens]);
+    }, [tenant, createAuthHeaders, getToken, getRefreshToken, setTokens]);
 
     const fetchAccessToken = async () => getToken();
 

@@ -1,10 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
+import { useTenant } from '@/contexts/TenantContext';
 
 const AUTH_API_URL = '/api/auth'; // Use Astro API proxy
 
 export default function CustomSignUp() {
+    const { tenant } = useTenant(); // Inject tenant context
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -63,6 +66,11 @@ export default function CustomSignUp() {
             return;
         }
 
+        if (!tenant?.id) {
+            toast.error('Tenant context not available. Please refresh the page.');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -70,11 +78,13 @@ export default function CustomSignUp() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-Tenant-ID': tenant.id, // CRITICAL: Header, not body
                 },
                 body: JSON.stringify({
                     email,
                     password,
                     full_name: fullName,
+                    // ✅ NO tenant_id in body (follows new API contract)
                 }),
             });
 

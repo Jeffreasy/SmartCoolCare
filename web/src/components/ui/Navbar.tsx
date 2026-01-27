@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { AuthProvider, useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/components/auth/AuthContext";
+import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
 import { Button } from "@/components/ui/Button";
 import CustomUserButton from "@/components/ui/CustomUserButton";
 
@@ -105,17 +106,15 @@ function NavbarContent() {
 export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) {
     if (enableAuth) {
         return (
-            <AuthProvider>
+            <AuthIslandWrapper>
                 <NavbarContent />
-            </AuthProvider>
+            </AuthIslandWrapper>
         );
     }
-    // If auth explicitly disabled (e.g. landing page optimization), rendering simplified header
-    // But currently we want consistent header, so just wrap it.
-    // If strict no-auth needed, we'd pass a dummy context or render simplified HTML.
+    // Consistent header with provider
     return (
-        <AuthProvider>
+        <AuthIslandWrapper>
             <NavbarContent />
-        </AuthProvider>
+        </AuthIslandWrapper>
     );
 }

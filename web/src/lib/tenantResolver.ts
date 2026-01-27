@@ -1,0 +1,161 @@
+/**
+ * Tenant Resolution System
+ * Resolves tenant slug → UUID via public API
+ * Implements caching for performance
+ */
+
+export interface TenantContext {
+    id: string;
+    name: string;
+    slug: string;
+    branding?: {
+        logo_url?: string;
+        primary_color?: string;
+        secondary_color?: string;
+    };
+}
+
+export class TenantResolver {
+    private static CACHE_KEY = 'tenant_context';
+    private static CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+    private static API_URL = import.meta.env.PUBLIC_AUTH_API_URL || 'https://laventecareauthsystems.onrender.com';
+
+    /**
+     * Resolve tenant slug to full context
+     */
+    static async resolve(slug: string): Promise<TenantContext> {
+        // 1. Check cache first
+        const cached = this.getFromCache();
+        if (cached && cached.slug === slug && this.isCacheValid()) {
+            console.log('[TenantResolver] Using cached tenant:', cached.name);
+            return cached;
+        }
+
+        // 2. Fetch from backend
+        console.log('[TenantResolver] Fetching tenant:', slug);
+        const response = await fetch(`${this.API_URL}/api/v1/tenants/${slug}`);
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(`Tenant not found: ${error.error || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        const context: TenantContext = {
+            id: data.id,
+            name: data.name,
+            slug: slug,
+            branding: data.branding
+        };
+
+        // 3. Cache the result
+        this.saveToCache(context);
+        console.log('[TenantResolver] Tenant resolved:', context.name, `(${context.id})`);
+
+        return context;
+    }
+
+    /**
+     * Auto-resolve from current subdomain
+     */
+    static async resolveFromSubdomain(): Promise<TenantContext> {
+        if (typeof window === 'undefined') {
+            throw new Error('resolveFromSubdomain can only be called in browser');
+        }
+
+        const hostname = window.location.hostname;
+
+        // Development fallback: localhost
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            const devTenantId = import.meta.env.PUBLIC_DEV_TENANT_ID;
+            const devTenantSlug = import.meta.env.PUBLIC_DEV_TENANT_SLUG || 'dev-tenant';
+
+            if (devTenantId) {
+                console.warn('[TenantResolver] Using development tenant override');
+                return {
+                    id: devTenantId,
+                    name: 'Development Tenant',
+                    slug: devTenantSlug
+                };
+            }
+
+            throw new Error('Running on localhost without PUBLIC_DEV_TENANT_ID. Configure subdomain or set env var.');
+        }
+
+        // Extract subdomain: bakkerij-jansen.laventecare.nl → bakkerij-jansen
+        const parts = hostname.split('.');
+        if (parts.length < 2) {
+            throw new Error('Invalid hostname: cannot extract subdomain');
+        }
+
+        const slug = parts[0];
+        return this.resolve(slug);
+    }
+
+    /**
+     * Get tenant from cache
+     */
+    static getFromCache(): TenantContext | null {
+        if (typeof window === 'undefined') return null;
+
+        const cached = localStorage.getItem(this.CACHE_KEY);
+        if (!cached) return null;
+
+        try {
+            const data = JSON.parse(cached);
+            return data.tenant || null;
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Check if cache is still valid
+     */
+    private static isCacheValid(): boolean {
+        if (typeof window === 'undefined') return false;
+
+        const cached = localStorage.getItem(this.CACHE_KEY);
+        if (!cached) return false;
+
+        try {
+            const data = JSON.parse(cached);
+            const timestamp = data.timestamp || 0;
+            const age = Date.now() - timestamp;
+            return age < this.CACHE_DURATION;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Save tenant to cache
+     */
+    private static saveToCache(tenant: TenantContext): void {
+        if (typeof window === 'undefined') return;
+
+        const data = {
+            tenant,
+            timestamp: Date.now()
+        };
+
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
+    }
+
+    /**
+     * Clear cached tenant
+     */
+    static clearCache(): void {
+        if (typeof window === 'undefined') return;
+        localStorage.removeItem(this.CACHE_KEY);
+    }
+
+    /**
+     * Get current tenant ID (sync, from cache only)
+     */
+    static getCurrentTenantId(): string | null {
+        const cached = this.getFromCache();
+        return cached?.id || null;
+    }
+}

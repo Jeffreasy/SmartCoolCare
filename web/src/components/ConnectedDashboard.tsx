@@ -2,7 +2,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import DeviceCard from "./DeviceCard";
 import DebugAuth from "./DebugAuth";
-import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
 import ConvexClientProvider from "./ConvexClientProvider";
 import AddDeviceModal from "./AddDeviceModal";
 import CustomUserButton from "./ui/CustomUserButton";
@@ -168,10 +168,10 @@ function DashboardContent() {
 
 export default function ConnectedDashboard() {
     return (
-        <AuthProvider>
+        <AuthIslandWrapper>
             <ConvexClientProvider>
                 <DashboardContent />
             </ConvexClientProvider>
-        </AuthProvider>
+        </AuthIslandWrapper>
     );
 }

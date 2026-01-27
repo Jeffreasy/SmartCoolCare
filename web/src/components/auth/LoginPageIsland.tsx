@@ -1,12 +1,12 @@
 import CustomSignIn from "./CustomSignIn";
-import { AuthProvider } from "./AuthContext";
+import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
 
 export default function LoginPageIsland() {
     return (
-        <AuthProvider>
+        <AuthIslandWrapper>
             <div className="flex justify-center items-center w-full">
                 <CustomSignIn />
             </div>
-        </AuthProvider>
+        </AuthIslandWrapper>
     );
 }
