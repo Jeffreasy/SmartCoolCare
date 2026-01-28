@@ -16,9 +16,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     const hasSession = !!(accessToken || refreshToken);
 
+    // CRITICAL FIX: The redirect loop happens because the Middleware (running on Vercel/Local)
+    // cannot see the cookies set by the Backend (on Render.com) due to Cross-Domain rules.
+    // So 'hasSession' is ALWAYS false here, causing a redirect to /login.
+    // Meanwhile, the Client (Browser) DOES have the cookies and redirects back to /dashboard.
+    // 
+    // We disable the Server-Side redirect for now and let the Client-Side AuthStore handle protection.
+
+    /* 
     if (isProtectedRoute && !hasSession) {
         return context.redirect("/login");
     }
+    */
 
     return next();
 });
