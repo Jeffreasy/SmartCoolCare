@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ResponsiveModal } from "./ui/Modal";
-import type { Id } from "../../convex/_generated/dataModel";
-import { DeviceTypeIcon } from "./ui/icons";
-import DeviceDetailView from "./devices/DeviceDetailView";
+import ResponsiveModal from "@/components/ui/Modal/ResponsiveModal";
+import type { Id } from "@/convex/_generated/dataModel";
+import { DeviceTypeIcon } from "@/components/ui/icons";
+import DeviceDetailView from "../DeviceDetailView";
 import type { BaseDeviceData } from "@/domain/device-types";
 
 interface DeviceDetailModalProps {

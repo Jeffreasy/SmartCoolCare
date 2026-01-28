@@ -1,10 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import LoginPageIsland from "../components/auth/LoginPageIsland.tsx";
+import CustomSignIn from "../components/auth/CustomSignIn";
 import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
 ---
 
-<Layout title="Log In - KoelkastProject" disableNavbarAuth={true}>
+<Layout title="Log In - KoelkastProject" hideNavbar={true}>
     <div
         class="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden"
     >
@@ -14,7 +14,7 @@ import BackgroundOrbs from "../components/ui/BackgroundOrbs.astro";
         <div
             class="w-full max-w-2xl relative z-10 animate-in fade-in zoom-in-95 duration-300"
         >
-            <LoginPageIsland client:only="react" />
+            <CustomSignIn client:only="react" />
         </div>
     </div>
 </Layout>

@@ -25,7 +25,12 @@ export const createAuthProxy = ({ method, endpoint, requiresAuth = false }: Auth
             if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
             const tenantId = request.headers.get('X-Tenant-ID');
-            if (tenantId) headers['X-Tenant-ID'] = tenantId;
+            if (tenantId) {
+                headers['X-Tenant-ID'] = tenantId;
+                console.log(`[Proxy] Forwarding Tenant ID: ${tenantId}`);
+            } else {
+                console.warn(`[Proxy] ⚠️ No Tenant ID found in request headers`);
+            }
 
             if (requiresAuth) {
                 const authHeader = request.headers.get('Authorization');
@@ -53,6 +58,8 @@ export const createAuthProxy = ({ method, endpoint, requiresAuth = false }: Auth
 
             // 3. Forward Request to Backend
             const targetUrl = `${AUTH_API_URL}${endpoint}`;
+            console.log(`[Proxy] Forwarding to: ${targetUrl}`);
+            console.log(`[Proxy] Outgoing Headers:`, JSON.stringify(headers));
 
             const response = await fetch(targetUrl, {
                 method,
@@ -62,12 +69,24 @@ export const createAuthProxy = ({ method, endpoint, requiresAuth = false }: Auth
             });
 
             // 4. Handle Response
+            console.log(`[Proxy] ${method} ${endpoint} -> Backend Status: ${response.status}`);
+
+            const responseHeaders = new Headers();
+            responseHeaders.set('Content-Type', 'application/json');
+
+            // ✅ CRITICAL: Forward Set-Cookie from backend to browser
+            const setCookie = response.headers.get('set-cookie');
+            if (setCookie) {
+                console.log('[Proxy] Forwarding Set-Cookie');
+                responseHeaders.set('Set-Cookie', setCookie);
+            }
+
             // STRICT IMPLEMENTATION (Law 1) - but allow text/plain for error codes
             const contentType = response.headers.get('content-type');
             let data;
 
             if (response.status === 204) {
-                return new Response(null, { status: 204 });
+                return new Response(null, { status: 204, headers: responseHeaders });
             } else if (contentType && contentType.includes('application/json')) {
                 data = await response.json();
             } else {
@@ -89,9 +108,7 @@ export const createAuthProxy = ({ method, endpoint, requiresAuth = false }: Auth
 
             return new Response(JSON.stringify(data), {
                 status: response.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: responseHeaders,
             });
 
         } catch (error) {

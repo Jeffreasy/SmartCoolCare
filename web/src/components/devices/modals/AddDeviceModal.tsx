@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { ResponsiveModal } from "./ui/Modal";
+import { api } from "@/convex/_generated/api";
+import ResponsiveModal from "@/components/ui/Modal/ResponsiveModal";
 import { Cpu, CheckCircle } from "lucide-react";
 
 interface AddDeviceModalProps {

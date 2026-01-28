@@ -4,11 +4,11 @@
  * Hoofdpagina met real-time monitoring van alle koelkasten
  */
 import Layout from "../layouts/Layout.astro";
-import ConnectedDashboard from "../components/ConnectedDashboard";
+import ConnectedDashboard from "../components/dashboard/ConnectedDashboard";
 import DashboardHeader from "../components/dashboard/DashboardHeader.astro";
 ---
 
-<Layout title="Koelkast Dashboard" disableNavbarAuth={true}>
+<Layout title="Koelkast Dashboard" hideNavbar={true}>
   <DashboardHeader
     title="System Overview"
     subtitle="Real-time telemetry & device status"

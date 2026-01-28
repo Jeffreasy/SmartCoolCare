@@ -1,22 +1,22 @@
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { useState, useEffect } from "react";
-import DeviceDetailModal from "./DeviceDetailModal";
+import DeviceDetailModal from "../modals/DeviceDetailModal";
 import { Cpu, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DeviceType, getDeviceType } from "@/domain/device-types";
 import type { BaseDeviceData, CoolCareDevice, SensorNodeDevice, GatewayHubDevice } from "@/domain/device-types";
 
 // Card Implementations
-import { CoolCareCard } from "./devices/cards/CoolCareCard";
-import { SensorNodeCard } from "./devices/cards/SensorNodeCard";
-import { GatewayCard } from "./devices/cards/GatewayCard";
+import { CoolCareCard } from "../cards/CoolCareCard";
+import { SensorNodeCard } from "../cards/SensorNodeCard";
+import { GatewayCard } from "../cards/GatewayCard";
 
 interface DeviceCardProps {
     onAddDevice?: () => void;
 }
 
-export default function DeviceCard(props: DeviceCardProps) {
+export default function DeviceGridController(props: DeviceCardProps) {
     // Secure: Use authenticated query
     const devices = useQuery(api.sensors.getLiveSensors);
     const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                         key={device._id}
                         device={device as CoolCareDevice}
                         onClick={() => handleCardClick(device._id)}
-                        onKeyDown={(e) => handleKeyDown(e, device._id)}
+                        onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, device._id)}
                     />
                 );
             case DeviceType.GATEWAY_HUB:
@@ -73,7 +73,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                         key={device._id}
                         device={device as GatewayHubDevice}
                         onClick={() => handleCardClick(device._id)}
-                        onKeyDown={(e) => handleKeyDown(e, device._id)}
+                        onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, device._id)}
                     />
                 );
             case DeviceType.SENSOR_NODE:
@@ -83,7 +83,7 @@ export default function DeviceCard(props: DeviceCardProps) {
                         key={device._id}
                         device={device as SensorNodeDevice}
                         onClick={() => handleCardClick(device._id)}
-                        onKeyDown={(e) => handleKeyDown(e, device._id)}
+                        onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, device._id)}
                     />
                 );
         }

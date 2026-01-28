@@ -1,7 +1,7 @@
 import type { CoolCareDevice, SensorNodeDevice } from "@/domain/device-types";
 import DeviceStatusCard from "../cards/DeviceStatusCard";
 import DeviceSensorCard from "../cards/DeviceSensorCard";
-import TemperatureChart from "../../../TemperatureChart";
+import TemperatureChart from "@/components/analytics/TemperatureChart";
 
 interface DeviceOverviewTabProps {
     device: CoolCareDevice | SensorNodeDevice;

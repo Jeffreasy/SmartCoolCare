@@ -9,10 +9,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const isProtectedRoute = !publicRoutes.includes(context.url.pathname) && !context.url.pathname.startsWith('/api/');
 
     // 2. Check Auth (Cookie)
-    // The AuthContext sets '__session' cookie on login
-    const token = context.cookies.get("__session")?.value;
+    // We check for EITHER 'access_token' OR 'refresh_token'.
+    // The backend refresh_token path fix ensures it's visible here.
+    const accessToken = context.cookies.get("access_token")?.value;
+    const refreshToken = context.cookies.get("refresh_token")?.value;
 
-    if (isProtectedRoute && !token) {
+    const hasSession = !!(accessToken || refreshToken);
+
+    if (isProtectedRoute && !hasSession) {
         return context.redirect("/login");
     }
 

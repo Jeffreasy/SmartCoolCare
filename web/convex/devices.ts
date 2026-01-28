@@ -54,6 +54,32 @@ export const claim = mutation({
             .unique();
 
         if (!device) {
+            // DEV HELPER: Auto-create demo device if it doesn't exist when claimed
+            if (args.deviceId === "demo_koelkast_01") {
+                console.log("Auto-creating demo device on claim...");
+                const newDeviceId = await ctx.db.insert("devices", {
+                    deviceId: "demo_koelkast_01",
+                    displayName: "Mijn Demo Koelkast",
+                    lastSeenAt: Date.now(),
+                    lastDeviceStatus: "healthy",
+                    lastSignalStrength: -45,
+                    lastWiredTemp: 4.2,
+                    lastWiredTimestamp: Date.now(),
+                    hardwareMac: "aabbccddeeff", // Matches "AA:BB..." verification
+                    config: {
+                        tempOffsetWired: 0.0,
+                        tempOffsetBle: 0.0,
+                    }
+                });
+                // Fetch it back to proceed with claim logic (or Just link it now)
+                // Let's just link it immediately and return
+                await ctx.db.patch(newDeviceId, {
+                    userId: user._id,
+                    claimedAt: Date.now()
+                });
+                return { success: true, message: "Demo device created and claimed!" };
+            }
+
             throw new Error("Device ID not found. Check the label on your fridge.");
         }
 

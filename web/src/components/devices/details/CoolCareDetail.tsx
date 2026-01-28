@@ -10,16 +10,21 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../
 
 interface CoolCareDetailProps {
     device: CoolCareDevice;
-    onClose: () => void;
+    onClose?: () => void;
+    activeTab?: 'overview' | 'history' | 'settings';
+    onTabChange?: (tab: 'overview' | 'history' | 'settings') => void;
 }
 
-export default function CoolCareDetail({ device, onClose }: CoolCareDetailProps) {
-    const [activeTab, setActiveTab] = useState<TabType>('overview');
+export default function CoolCareDetail({ device, onClose, activeTab: propTab, onTabChange }: CoolCareDetailProps) {
+    const [localTab, setLocalTab] = useState<TabType>('overview');
+    const activeTab = propTab || localTab;
+    const setActiveTab = onTabChange || setLocalTab;
 
     // Reset tab when device changes
     useEffect(() => {
-        setActiveTab('overview');
-    }, [device.deviceId]);
+        if (!propTab) setLocalTab('overview');
+        // If propTab is controlled, parent handles reset likely
+    }, [device.deviceId, propTab]);
 
     return (
         <div className="h-full flex flex-col">

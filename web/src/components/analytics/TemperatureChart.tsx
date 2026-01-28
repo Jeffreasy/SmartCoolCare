@@ -4,11 +4,11 @@ import { Chart as ChartJS } from 'chart.js';
 import type { ChartConfiguration, ScriptableContext } from 'chart.js';
 
 // Modular Components
-import { CHART_THEME } from "./analytics/ChartConfig";
-import type { TimeRange, ViewMode, ChartDataPoint, MetricType } from "./analytics/ChartConfig";
-import ChartControls from "./analytics/ChartControls";
-import ChartStats from "./analytics/ChartStats";
-import TemperatureTableView from "./analytics/TemperatureTableView";
+import { CHART_THEME } from "./ChartConfig";
+import type { TimeRange, ViewMode, ChartDataPoint, MetricType } from "./ChartConfig";
+import ChartControls from "./ChartControls";
+import ChartStats from "./ChartStats";
+import TemperatureTableView from "./TemperatureTableView";
 import { useTelemetryData } from "@/hooks/useTelemetryData";
 
 interface TemperatureChartProps {

@@ -1,11 +1,11 @@
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import DeviceCard from "./DeviceCard";
-import DebugAuth from "./DebugAuth";
-import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
-import ConvexClientProvider from "./ConvexClientProvider";
-import AddDeviceModal from "./AddDeviceModal";
-import CustomUserButton from "./ui/CustomUserButton";
+import { api } from "@/convex/_generated/api";
+import type { BaseDeviceData, CoolCareDevice } from "@/domain/device-types";
+import DeviceGridController from "@/components/devices/containers/DeviceGridController";
+import { Toaster } from "@/components/ui/sonner";
+import ConvexClientProvider from "@/components/providers/ConvexClientProvider";
+import AddDeviceModal from "@/components/devices/modals/AddDeviceModal";
+import CustomUserButton from "@/components/ui/CustomUserButton";
 import { useState } from "react";
 import { Plus, Server, Activity, AlertTriangle, Thermometer } from "lucide-react";
 import { useAuthSync } from "@/hooks/useAuthSync";
@@ -45,8 +45,8 @@ function DashboardContent() {
 
     if (devices) {
         stats.total = devices.length;
-        stats.online = devices.filter(d => d.lastDeviceStatus !== "offline" && d.lastDeviceStatus !== "unknown").length;
-        stats.attention = devices.filter(d => {
+        stats.online = devices.filter((d: CoolCareDevice) => d.lastDeviceStatus !== "offline" && d.lastDeviceStatus !== "unknown").length;
+        stats.attention = devices.filter((d: CoolCareDevice) => {
             // 1. Critical Status
             if (d.lastDeviceStatus === "offline" || d.lastDeviceStatus === "warning") return true;
 
@@ -71,7 +71,7 @@ function DashboardContent() {
         let totalHum = 0;
         let countHum = 0;
 
-        devices.forEach(d => {
+        devices.forEach((d: CoolCareDevice) => {
             // Wired Temp (DS18B20)
             if (d.lastWiredTemp !== undefined) {
                 totalWired += d.lastWiredTemp;
@@ -159,19 +159,17 @@ function DashboardContent() {
                 />
             </div>
 
-            <DeviceCard onAddDevice={() => setIsAddDeviceOpen(true)} />
+            <DeviceGridController onAddDevice={() => setIsAddDeviceOpen(true)} />
             <AddDeviceModal isOpen={isAddDeviceOpen} onClose={() => setIsAddDeviceOpen(false)} />
-            {import.meta.env.DEV && <DebugAuth />}
+            <AddDeviceModal isOpen={isAddDeviceOpen} onClose={() => setIsAddDeviceOpen(false)} />
         </>
     );
 }
 
 export default function ConnectedDashboard() {
     return (
-        <AuthIslandWrapper>
-            <ConvexClientProvider>
-                <DashboardContent />
-            </ConvexClientProvider>
-        </AuthIslandWrapper>
+        <ConvexClientProvider>
+            <DashboardContent />
+        </ConvexClientProvider>
     );
 }

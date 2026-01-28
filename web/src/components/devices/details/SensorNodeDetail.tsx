@@ -10,16 +10,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../
 
 interface SensorNodeDetailProps {
     device: SensorNodeDevice;
-    onClose: () => void;
+    onClose?: () => void;
+    activeTab?: 'overview' | 'history' | 'settings';
+    onTabChange?: (tab: 'overview' | 'history' | 'settings') => void;
 }
 
-export default function SensorNodeDetail({ device, onClose }: SensorNodeDetailProps) {
-    const [activeTab, setActiveTab] = useState<TabType>('overview');
+export default function SensorNodeDetail({ device, onClose, activeTab: propTab, onTabChange }: SensorNodeDetailProps) {
+    const [localTab, setLocalTab] = useState<TabType>('overview');
+    const activeTab = propTab || localTab;
+    const setActiveTab = onTabChange || setLocalTab;
 
     // Reset tab when device changes
     useEffect(() => {
-        setActiveTab('overview');
-    }, [device.deviceId]);
+        if (!propTab) setLocalTab('overview');
+    }, [device.deviceId, propTab]);
 
     return (
         <div className="h-full flex flex-col">

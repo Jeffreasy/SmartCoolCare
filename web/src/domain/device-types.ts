@@ -13,6 +13,8 @@ export interface BaseDeviceData {
     lastDeviceStatus: string; // 'online' | 'offline' | 'degraded'
     lastSeenAt: number;
     lastSignalStrength: number;
+    minTemp?: number;
+    maxTemp?: number;
 }
 
 export interface CoolCareDevice extends BaseDeviceData {

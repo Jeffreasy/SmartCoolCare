@@ -11,6 +11,7 @@
  */
 import "../styles/global.css";
 import Navbar from "../components/ui/Navbar";
+import AuthInitializer from "@/components/auth/AuthInitializer";
 
 interface Props {
     title: string;
@@ -40,6 +41,7 @@ const { title, disableNavbarAuth = false, hideNavbar = false } = Astro.props;
         />
     </head>
     <body class="min-h-screen bg-bg text-text font-sans">
+        <AuthInitializer client:only="react" />
         {!hideNavbar && <Navbar client:load enableAuth={!disableNavbarAuth} />}
         <slot />
     </body>

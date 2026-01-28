@@ -1,12 +1,18 @@
 import { useState, type FormEvent } from 'react';
+
+import { useStore } from '@nanostores/react';
+import { $tenant, initTenant } from '@/lib/stores/tenantStore';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
-import { useTenant } from '@/contexts/TenantContext';
 
 const AUTH_API_URL = '/api/auth'; // Use Astro API proxy
 
 export default function CustomSignUp() {
-    const { tenant } = useTenant(); // Inject tenant context
+    const tenant = useStore($tenant); // Inject tenant store
+
+    // Ensure tenant is loaded
+    useState(() => { initTenant(); });
+
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

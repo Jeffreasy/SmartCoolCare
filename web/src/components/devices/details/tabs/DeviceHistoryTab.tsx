@@ -1,4 +1,4 @@
-import TemperatureChart from "../../../TemperatureChart";
+import TemperatureChart from "@/components/analytics/TemperatureChart";
 import type { MetricType } from "../../../analytics/ChartConfig";
 
 interface DeviceHistoryTabProps {

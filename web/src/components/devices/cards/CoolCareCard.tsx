@@ -1,5 +1,6 @@
 import type { CoolCareDevice } from "@/domain/device-types";
-import { SensorMetric, StatusHeader, FooterMetrics, HumidityBanner } from "./SharedComponents";
+import { SensorMetric, HumidityBanner } from "./SharedComponents";
+import { BaseCardShell, REQUEST_THEMES } from "./BaseCardShell";
 
 interface CoolCareCardProps {
     device: CoolCareDevice;
@@ -8,34 +9,14 @@ interface CoolCareCardProps {
 }
 
 export function CoolCareCard({ device, onClick, onKeyDown }: CoolCareCardProps) {
-    const isOnline = device.lastDeviceStatus !== "offline";
-
     return (
-        <div
-            role="button"
-            tabIndex={0}
+        <BaseCardShell
+            device={device}
             onClick={onClick}
             onKeyDown={onKeyDown}
-            className={`
-                glass-card
-                relative overflow-hidden
-                p-4 sm:p-6
-                cursor-pointer
-                transition-all duration-300
-                hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-500/10
-                group
-                focus:outline-none focus:ring-2 focus:ring-primary/50
-            `}
+            theme={REQUEST_THEMES.cool}
+            batteryLevel={device.lastBleBattery}
         >
-            {/* Decorative Glow Line (Blue/Cool for Fridge) */}
-            <div className={`
-                absolute top-0 left-0 bottom-0 w-1.5
-                ${isOnline ? 'bg-gradient-to-b from-blue-400 to-indigo-600' : 'bg-slate-700'}
-                shadow-[0_0_15px_rgba(96,165,250,0.3)]
-            `} />
-
-            <StatusHeader device={device} isOnline={isOnline} />
-
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 pl-3">
                 <SensorMetric
                     label="INTERNAL"
@@ -55,12 +36,6 @@ export function CoolCareCard({ device, onClick, onKeyDown }: CoolCareCardProps) 
                     <HumidityBanner value={device.lastBleHumidity} />
                 )}
             </div>
-
-            <FooterMetrics
-                device={device}
-                showBattery={device.lastBleBattery !== undefined}
-                batteryLevel={device.lastBleBattery}
-            />
-        </div>
+        </BaseCardShell>
     );
 }

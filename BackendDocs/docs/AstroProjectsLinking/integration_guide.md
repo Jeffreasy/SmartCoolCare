@@ -51,11 +51,15 @@ The backend uses a **Dual-Token** system for maximum security:
      X-Tenant-ID: <your-tenant-uuid>
      ```
    - **Response:**
-     - **JSON Body:** 
+     - **Status:** `200 OK`
+     - **Headers:**
+       ```
+       Set-Cookie: access_token=<jwt>; HttpOnly; Secure; SameSite=Strict; MaxAge=900
+       Set-Cookie: refresh_token=<opaque>; HttpOnly; Secure; SameSite=Strict; MaxAge=604800; Path=/
+       ```
+     - **JSON Body (tokens NOT included for XSS protection):**
        ```json
        {
-         "access_token": "eyJhbGc...",
-         "refresh_token": "opaque-token-123",
          "user": {
            "id": "uuid",
            "email": "user@example.com",
@@ -64,17 +68,17 @@ The backend uses a **Dual-Token** system for maximum security:
          }
        }
        ```
-     - **Cookies (HttpOnly, Secure):**
-       - `access_token` (MaxAge: 15 min)
-       - `refresh_token` (MaxAge: 7 days)
+     - **⚠️ IMPORTANT:** Tokens are ONLY returned via `Set-Cookie` headers
+     - **❌ DO NOT** try to access `response.access_token` - it doesn't exist in JSON
 
 2. **Protected Requests**
-   - **Client-Side:** Use `Authorization: Bearer <access_token>` header
+   - **Client-Side:** Use `credentials: 'include'` to send cookies automatically
    - **Server-Side (SSR):** Cookies are automatically included
+   - **❌ DO NOT** manually add Authorization header - cookies handle this
 
 3. **Token Refresh** (`POST /api/v1/auth/refresh`)
-   - Automatically uses `refresh_token` cookie
-   - Returns new `access_token` + `refresh_token` pair
+   - Automatically uses `refresh_token` cookie (no request body needed)
+   - Returns new tokens via `Set-Cookie` headers
    - **Call this when you get 401 Unauthorized**
 
 ---
@@ -236,7 +240,13 @@ if err != nil {
 | `POST` | `/api/v1/auth/register` | User registration | `X-Tenant-ID` | 5/15min |
 | `POST` | `/api/v1/auth/login` | User login | `X-Tenant-ID` | 5/15min |
 | `POST` | `/api/v1/auth/logout` | Logout (clears cookies) | `X-Tenant-ID` | 10/1min |
+| `POST` | `/api/v1/auth/refresh` | Refresh access token | None (uses cookie) | 10/1min |
+| `POST` | `/api/v1/auth/password/forgot` | Request password reset email | `X-Tenant-ID` | 3/1hour |
+| `POST` | `/api/v1/auth/password/reset` | Complete password reset with token | None | 3/1hour |
+| `POST` | `/api/v1/auth/email/resend` | Resend verification email | `X-Tenant-ID` | 3/1hour |
+| `POST` | `/api/v1/auth/email/verify` | Verify email with token | None | 5/1hour |
 | `POST` | `/api/v1/auth/mfa/verify` | Verify MFA code | `X-Tenant-ID` | 3/5min |
+| `POST` | `/api/v1/auth/mfa/backup` | Verify via Backup Code | `X-Tenant-ID` | 3/5min |
 | `GET` | `/api/v1/tenants/{slug}` | Get tenant info by slug | None | 100/1min |
 | `GET` | `/.well-known/openid-configuration` | OIDC config | None | 100/1min |
 | `GET` | `/.well-known/jwks.json` | Public keys (JWKS) | None | 100/1min |
@@ -248,7 +258,6 @@ if err != nil {
 | `GET` | `/api/v1/me` | Get current user profile | Any | 100/1min |
 | `GET` | `/api/v1/auth/sessions` | List active sessions | Any | 10/1min |
 | `DELETE` | `/api/v1/auth/sessions/{id}` | Revoke session | Any | 10/1min |
-| `DELETE` | `/api/v1/auth/sessions/all` | **Revoke all other sessions** | Any | 5/1min |
 | `POST` | `/api/v1/auth/mfa/setup` | Setup MFA | Any | 3/5min |
 | `POST` | `/api/v1/auth/mfa/activate` | Activate MFA | Any | 3/5min |
 | `PATCH` | `/api/v1/auth/profile` | Update profile | Any | 10/1min |
@@ -261,6 +270,7 @@ if err != nil {
 | Method | Endpoint | Description | Rate Limit |
 |--------|----------|-------------|------------|
 | `GET` | `/api/v1/admin/users` | List users in tenant | 100/1min |
+| `DELETE` | `/api/v1/admin/tenants` | Soft Delete Tenant | 1/1day |
 | `PATCH` | `/api/v1/admin/users/{userID}` | Update user role | 10/1min |
 | `DELETE` | `/api/v1/admin/users/{userID}` | Remove user | 10/1min |
 | `POST` | `/api/v1/admin/users/invite` | Send invitation email | 20/1hour |
@@ -268,6 +278,9 @@ if err != nil {
 | `POST` | `/api/v1/admin/mail-config` | Update SMTP config | 5/1hour |
 | `DELETE` | `/api/v1/admin/mail-config` | Remove SMTP config | 5/1hour |
 | `GET` | `/api/v1/admin/email-stats` | Email delivery stats | 100/1min |
+| `GET` | `/api/v1/admin/cors-origins` | Get allowed CORS origins | 10/1min |
+| `PUT` | `/api/v1/admin/cors-origins` | Update CORS origins (validates wildcard) | 5/1hour |
+| `GET` | `/api/v1/admin/audit-logs` | View audit trail (pagination) | 100/1min |
 
 ### IoT Telemetry Endpoint
 
@@ -394,9 +407,9 @@ export async function fetchProfile(): Promise<User> {
     throw new Error('Failed to fetch profile');
   }
 
-  const user = await res.json();
-  $user.set(user);
-  return user;
+  const data = await res.json();
+  $user.set(data.user); // ✅ Extract user from wrapper
+  return data.user;
 }
 ```
 

@@ -69,19 +69,16 @@ export class TenantResolver {
 
         // Development fallback: localhost
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            const devTenantId = import.meta.env.PUBLIC_DEV_TENANT_ID;
-            const devTenantSlug = import.meta.env.PUBLIC_DEV_TENANT_SLUG || 'dev-tenant';
+            // Default to SmartCoolCare (Verified Render Production ID)
+            const devTenantId = import.meta.env.PUBLIC_DEV_TENANT_ID || "7c1efbe8-d419-4127-9ea2-a6e67ed49a1f";
+            const devTenantSlug = import.meta.env.PUBLIC_DEV_TENANT_SLUG || "smartcoolcare";
 
-            if (devTenantId) {
-                console.warn('[TenantResolver] Using development tenant override');
-                return {
-                    id: devTenantId,
-                    name: 'Development Tenant',
-                    slug: devTenantSlug
-                };
-            }
-
-            throw new Error('Running on localhost without PUBLIC_DEV_TENANT_ID. Configure subdomain or set env var.');
+            console.warn('[TenantResolver] Using development tenant override:', devTenantSlug);
+            return {
+                id: devTenantId,
+                name: 'SmartCoolCare',
+                slug: devTenantSlug
+            };
         }
 
         // Extract subdomain: bakkerij-jansen.laventecare.nl → bakkerij-jansen

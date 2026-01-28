@@ -1,8 +1,8 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useAuth } from "@/components/auth/AuthContext";
-import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
-import ConvexClientProvider from "../ConvexClientProvider";
+import { useStore } from "@nanostores/react";
+import { authStore } from "@/lib/authStore";
+import ConvexClientProvider from "@/components/providers/ConvexClientProvider";
 import DeviceDetailView from "./DeviceDetailView";
 import { ArrowLeft } from "lucide-react";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -11,16 +11,14 @@ import type { BaseDeviceData } from "@/domain/device-types";
 // Wrapper to provide Context providers
 export default function DeviceDetailPageIsland({ deviceId }: { deviceId: string }) {
     return (
-        <AuthIslandWrapper>
-            <ConvexClientProvider>
-                <DeviceDetailPageContent deviceId={deviceId} />
-            </ConvexClientProvider>
-        </AuthIslandWrapper>
+        <ConvexClientProvider>
+            <DeviceDetailPageContent deviceId={deviceId} />
+        </ConvexClientProvider>
     );
 }
 
 function DeviceDetailPageContent({ deviceId }: { deviceId: string }) {
-    const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+    const { isAuthenticated, isLoading: isAuthLoading } = useStore(authStore);
     const devices = useQuery(api.sensors.getLiveSensors);
 
     // 1. Auth Loading

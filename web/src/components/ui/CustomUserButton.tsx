@@ -1,4 +1,6 @@
-import { useCustomAuth } from '@/hooks/useCustomAuth';
+import { useStore } from '@nanostores/react';
+import { authStore } from '@/lib/authStore';
+import { useAuthActions } from '@/hooks/useAuthActions';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,7 +12,8 @@ import {
 import { LogOut, Settings, User } from 'lucide-react';
 
 export default function CustomUserButton() {
-    const { user, logout } = useCustomAuth();
+    const { user } = useStore(authStore);
+    const { logout } = useAuthActions();
 
     if (!user) return null;
 

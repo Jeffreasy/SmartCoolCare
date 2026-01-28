@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "@/components/auth/AuthContext";
-import { AuthIslandWrapper } from "@/components/providers/AuthIslandWrapper";
+import { useStore } from "@nanostores/react";
+import { authStore } from "@/lib/authStore";
 import { Button } from "@/components/ui/Button";
 import CustomUserButton from "@/components/ui/CustomUserButton";
 
 function NavbarContent() {
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { isAuthenticated, isLoading } = useAuth(); // Use new hook directly
+
+    // ✅ ALWAYS use nanostores
+    const { isAuthenticated, isLoading } = useStore(authStore);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -118,17 +120,9 @@ function NavbarContent() {
 }
 
 export default function Navbar({ enableAuth = true }: { enableAuth?: boolean }) {
-    if (enableAuth) {
-        return (
-            <AuthIslandWrapper>
-                <NavbarContent />
-            </AuthIslandWrapper>
-        );
-    }
-    // Consistent header with provider
+    // ✅ ALWAYS wrap in AuthIslandWrapper
+    // Pages that don't want Navbar should use hideNavbar={true} in Layout
     return (
-        <AuthIslandWrapper>
-            <NavbarContent />
-        </AuthIslandWrapper>
+        <NavbarContent />
     );
 }

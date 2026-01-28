@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useCustomAuth } from '@/hooks/useCustomAuth';
+import { useAuthActions } from '@/hooks/useAuthActions';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Mail, Lock, KeyRound, ArrowRight } from 'lucide-react';
@@ -13,7 +13,7 @@ export default function CustomSignIn() {
     const [preAuthToken, setPreAuthToken] = useState('');
     const [userId, setUserId] = useState('');
 
-    const { login, verifyMFA } = useCustomAuth();
+    const { login, verifyMFA } = useAuthActions();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
