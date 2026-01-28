@@ -110,6 +110,12 @@ export const checkAuth = async () => {
                 error: null
             });
             console.log('[AuthStore] ✅ Session Validated');
+
+            // Redirect if on login page and authenticated
+            if (isLoginPage()) {
+                console.log('[AuthStore] 🔄 Public page + Auth = Redirecting to dashboard...');
+                window.location.href = '/dashboard';
+            }
         } else {
             throw new Error('Unauthorized');
         }
