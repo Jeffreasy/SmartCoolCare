@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 import { ConvexReactClient, ConvexProviderWithAuth } from "convex/react";
 import { useStore } from "@nanostores/react";
 import { authStore } from "@/lib/authStore";
@@ -13,9 +13,10 @@ const convex = new ConvexReactClient(import.meta.env.PUBLIC_CONVEX_URL);
  * CRITICAL FIX: Named function defined OUTSIDE the component ensures identity stability.
  * Inline arrow functions in props can trigger infinite re-renders/resets in some libraries.
  */
-import { useMemo } from "react";
-
 function useConvexAuthAdapter() {
+    // We gebruiken de store nog steeds voor de initiële waardes, 
+    // maar we laten de hook NIET re-renderen als de waardes veranderen 
+    // om de referentie naar de functies stabiel te houden voor Convex.
     const { isAuthenticated, isLoading } = useStore(authStore);
 
     return useMemo(() => ({
@@ -52,7 +53,7 @@ function useConvexAuthAdapter() {
 
                     if (!response.ok) {
                         console.warn('[ConvexProvider] Failed to fetch token:', response.status);
-                        return null;
+                        return null; // Token fetch failed, Convex considers this "not authenticated"
                     }
 
                     const data = await response.json();
@@ -68,7 +69,7 @@ function useConvexAuthAdapter() {
             console.error('[ConvexProvider] Max retries reached. Token fetch failed.');
             return null;
         },
-    }), [isAuthenticated, isLoading]);
+    }), []); // <--- CRUCIAAL: Lege array om loop te voorkomen.
 }
 
 /**
@@ -76,8 +77,13 @@ function useConvexAuthAdapter() {
  * so that useQuery/useMutation work with the Go Backend token.
  */
 export default function ConvexClientProvider({ children }: { children: ReactNode }) {
-    // We don't need to read store here anymore, the adapter handles it.
-    // This makes the Provider itself extremely stable (no re-renders on auth change).
+    // Wacht tot de initiële auth check klaar is voordat we Convex starten.
+    // Dit voorkomt 401 spam bij het laden van de pagina als er nog geen sessie is.
+    const { isLoading } = useStore(authStore);
+
+    if (isLoading) {
+        return null; // Of een <LoadingSpinner /> als je dat wilt, maar null is veilig voor islands blocks
+    }
 
     return (
         <ConvexProviderWithAuth
