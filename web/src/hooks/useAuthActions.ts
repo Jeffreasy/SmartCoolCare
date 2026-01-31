@@ -2,9 +2,7 @@ import { useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { $tenant } from '@/lib/stores/tenantStore';
 import { loginUser, logoutUser } from '@/lib/authStore';
-
-// USE PROXY (Relative Path) to share cookies with SSR/Middleware
-const AUTH_API_URL = '/api/v1/auth';
+import { api } from '@/lib/api';
 
 export interface LoginResult {
     success: boolean;
@@ -17,24 +15,16 @@ export interface LoginResult {
 export function useAuthActions() {
     const tenant = useStore($tenant);
 
-    const createAuthHeaders = useCallback((): HeadersInit => {
-        const headers: HeadersInit = { 'Content-Type': 'application/json' };
-        if (tenant?.id) {
-            headers['X-Tenant-ID'] = tenant.id;
-            console.log('[useAuthActions] Attaching Tenant ID:', tenant.id);
-        } else {
-            console.warn('[useAuthActions] ⚠️ No Tenant ID available for headers!');
-        }
-        return headers;
-    }, [tenant]);
-
     const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
         try {
-            const response = await fetch(`${AUTH_API_URL}/login`, {
+            const headers: HeadersInit = {};
+            if (tenant?.id) headers['X-Tenant-ID'] = tenant.id;
+
+            const response = await api('v1/auth/login', {
                 method: 'POST',
-                headers: createAuthHeaders(),
-                credentials: 'include',
+                headers,
                 body: JSON.stringify({ email, password }),
+                skipRefresh: true
             });
 
             const data = await response.json();
@@ -63,15 +53,18 @@ export function useAuthActions() {
         } catch (error) {
             return { success: false, error: error instanceof Error ? error.message : 'Login failed' };
         }
-    }, [createAuthHeaders]);
+    }, [tenant]);
 
     const verifyMFA = useCallback(async (code: string, userId: string, preAuthToken?: string) => {
         try {
-            const response = await fetch(`${AUTH_API_URL}/mfa/verify`, {
+            const headers: HeadersInit = {};
+            if (tenant?.id) headers['X-Tenant-ID'] = tenant.id;
+
+            const response = await api('v1/auth/mfa/verify', {
                 method: 'POST',
-                headers: createAuthHeaders(),
-                credentials: 'include',
+                headers,
                 body: JSON.stringify({ userId, code, pre_auth_token: preAuthToken }),
+                skipRefresh: true
             });
 
             const data = await response.json();
@@ -91,7 +84,7 @@ export function useAuthActions() {
         } catch (error) {
             return { success: false, error: error instanceof Error ? error.message : 'MFA failed' };
         }
-    }, [createAuthHeaders]);
+    }, [tenant]);
 
     const logout = useCallback(async () => {
         await logoutUser();

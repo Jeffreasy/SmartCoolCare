@@ -19,16 +19,8 @@ export const ALL: APIRoute = async ({ request, params, url }) => {
     const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
     const targetUrl = `${baseUrl}/${path}${url.search}`;
 
-    console.log(`[BFF] Proxying ${request.method} /api/${path} -> ${targetUrl}`);
-
     // 2. Prepare Headers
     const requestHeaders = new Headers(request.headers);
-
-    // DEBUG: Trace Cookies
-    const cookieHeader = requestHeaders.get('cookie');
-    console.log(`[BFF] 📥 Incoming Request: ${request.method} ${request.url}`);
-    console.log(`[BFF] 🍪 Incoming Cookies: ${cookieHeader ? 'PRESENT' : 'MISSING'}`);
-    if (cookieHeader) console.log(`[BFF] 🍪 Cookie Value: ${cookieHeader.substring(0, 50)}...`);
 
     // Host header must be the target host, not localhost
     requestHeaders.delete('host');
@@ -81,7 +73,6 @@ export const ALL: APIRoute = async ({ request, params, url }) => {
                 // In production (https), we keep them.
                 // We detect dev via import.meta.env.DEV
                 if (import.meta.env.DEV) {
-                    console.log(`[BFF] 🔧 Original Set-Cookie: ${newCookie}`);
                     newCookie = newCookie.replace(/; Secure/gi, '');
                     newCookie = newCookie.replace(/; Partitioned/gi, '');
 
@@ -93,9 +84,6 @@ export const ALL: APIRoute = async ({ request, params, url }) => {
                     newCookie = newCookie.replace(/;\s*Domain=[^;]+/gi, '');
                     // Force SameSite=Lax
                     newCookie = newCookie.replace(/; SameSite=None/gi, '; SameSite=Lax');
-                    console.log(`[BFF] ✂️ Sanitized Set-Cookie: ${newCookie}`);
-                } else {
-                    console.log(`[BFF] 📤 Response Set-Cookie: ${newCookie}`);
                 }
                 responseHeaders.append('Set-Cookie', newCookie);
             });

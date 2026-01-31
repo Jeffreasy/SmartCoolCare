@@ -46,28 +46,24 @@ function useConvexAuthAdapter() {
                     });
 
                     if (response.status === 429) {
-                        console.warn(`[ConvexProvider] Rate limit hit (429). Retrying in ${1000 * (attempt + 1)}ms...`);
                         await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
                         attempt++;
                         continue;
                     }
 
                     if (!response.ok) {
-                        console.warn('[ConvexProvider] Failed to fetch token:', response.status);
-                        return null; // Token fetch failed, Convex considers this "not authenticated"
+                        return null;
                     }
 
                     const data = await response.json();
                     return data.token;
                 } catch (err) {
-                    console.error(`[ConvexProvider] Network attempt ${attempt + 1} failed:`, err);
                     attempt++;
                     if (attempt < MAX_RETRIES) {
                         await new Promise(r => setTimeout(r, 500 * attempt));
                     }
                 }
             }
-            console.error('[ConvexProvider] Max retries reached. Token fetch failed.');
             return null;
         },
     }), [isAuthenticated]); // <--- CORRECTED: Depends on auth state to trigger re-fetch on login
