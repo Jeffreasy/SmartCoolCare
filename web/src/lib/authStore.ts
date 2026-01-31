@@ -29,7 +29,8 @@ const isLoginPage = () => {
 };
 
 // Configuration
-const AUTH_API_URL = 'https://laventecareauthsystems.onrender.com/api/v1/auth';
+// USE PROXY (Relative Path) to share cookies with SSR/Middleware
+const AUTH_API_URL = '/api/v1/auth';
 
 /**
  * Core Auth Action: Check Session

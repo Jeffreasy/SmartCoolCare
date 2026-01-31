@@ -3,7 +3,8 @@ import { useStore } from '@nanostores/react';
 import { $tenant } from '@/lib/stores/tenantStore';
 import { loginUser, logoutUser } from '@/lib/authStore';
 
-const AUTH_API_URL = 'https://laventecareauthsystems.onrender.com/api/v1/auth';
+// USE PROXY (Relative Path) to share cookies with SSR/Middleware
+const AUTH_API_URL = '/api/v1/auth';
 
 export interface LoginResult {
     success: boolean;

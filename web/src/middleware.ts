@@ -23,11 +23,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // 
     // We disable the Server-Side redirect for now and let the Client-Side AuthStore handle protection.
 
-    /* 
+    // 3. Auth Enforcement
+    // With the Universal BFF Proxy, cookies are now correctly set on localhost.
+    // We can strictly enforce presence of tokens.
     if (isProtectedRoute && !hasSession) {
+        // Redirect to login if no session rules found
         return context.redirect("/login");
     }
-    */
 
     return next();
 });

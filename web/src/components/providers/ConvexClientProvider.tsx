@@ -38,7 +38,8 @@ function useConvexAuthAdapter() {
                         headers['X-Tenant-ID'] = tenant.id;
                     }
 
-                    const response = await fetch('https://laventecareauthsystems.onrender.com/api/v1/auth/token', {
+                    // USE PROXY (Relative Path) to share cookies with SSR/Middleware
+                    const response = await fetch('/api/v1/auth/token', {
                         method: 'GET',
                         headers,
                         credentials: 'include',
@@ -69,7 +70,7 @@ function useConvexAuthAdapter() {
             console.error('[ConvexProvider] Max retries reached. Token fetch failed.');
             return null;
         },
-    }), []); // <--- CRUCIAAL: Lege array om loop te voorkomen.
+    }), [isAuthenticated]); // <--- CORRECTED: Depends on auth state to trigger re-fetch on login
 }
 
 /**
